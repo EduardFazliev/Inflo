@@ -17,7 +17,7 @@ def main():
     configure.set_defaults(func=inflo.store_conf)
 
     tenant_info = subparsers.add_parser('tenant-info', help='Get tenant info.')
-    tenant_info.add_argument('-p', '--password', action='store_true', help='Use previously set password or
+    tenant_info.add_argument('-p', '--password', action='store_true', help='Use previously set password or'
                                                                            'insert API and ID manually.')
     tenant.set_defaults(func=inflo.store_conf)
 
