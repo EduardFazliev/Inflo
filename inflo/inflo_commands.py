@@ -11,7 +11,7 @@ def get_tenant_info(api_key=None, customer_id=None):
 
     payload = {'clientId': customer_id, 'apiKey': api_key}
 
-    code, message = requests_lib.send_get_request(url, api_key, customer_id)
+    code, message = requests_lib.send_get_request(url, payload)
 
     if code != -1:
         print message

@@ -6,6 +6,14 @@ import logging
 import inflo
 
 
+def invoke_store_conf(args):
+    inflo.set_conf(args.api_key, args.customer_id)
+
+
+def invoke_get_tenant_info(args):
+    inflo.get_tenant_info(args.password)
+
+
 def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
@@ -14,12 +22,12 @@ def main():
                                                         'Use this if you want to temporary store credentials in file.')
     configure.add_argument('-a', '--api-key', type=str, help='API key.')
     configure.add_argument('-i', '--customer-id', type=str, help='Client ID.')
-    configure.set_defaults(func=inflo.store_conf)
+    configure.set_defaults(func=invoke_store_conf)
 
     tenant_info = subparsers.add_parser('tenant-info', help='Get tenant info.')
     tenant_info.add_argument('-p', '--password', action='store_true', help='Use previously set password or'
                                                                            'insert API and ID manually.')
-    tenant_info.set_defaults(func=inflo.get_tenant_info)
+    tenant_info.set_defaults(func=invoke_get_tenant_info)
 
     args = parser.parse_args()
     args.func(args)
