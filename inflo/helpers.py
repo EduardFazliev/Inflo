@@ -40,7 +40,7 @@ def set_conf(ext_api, ext_id):
 
     encr_api = simplecrypt.encrypt(password, api)
     encr_id = simplecrypt.encrypt(password, cust_id)
-    with open(filename, 'w') as f:
+    with open(filename, 'wb') as f:
         f.write(encr_api)
         f.write(encr_id)
     logger.debug('API and ID successfully encrypted and stored to file.')
@@ -49,10 +49,10 @@ def set_conf(ext_api, ext_id):
 def get_conf():
     password = getpass.getpass('Enter password:')
 
-    with open(filename, 'r') as f:
+    with open(filename, 'rb') as f:
         try:
-            api = simplecrypt.decrypt(password, f.readline())
-            cust_id = simplecrypt.decrypt(password, f.readline())
+            api = simplecrypt.decrypt(password, f.readline().rstrip('\n')).decode('utf-8')
+            cust_id = simplecrypt.decrypt(password, f.readline().rstrip('\n')).decode('utf-8')
         except Exception as e:
             logger.debug('Error occured while decrypting API and ID: {0}'.format(e))
             print 'Wrong password, sorry dude... bye!'
