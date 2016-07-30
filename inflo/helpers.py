@@ -55,7 +55,11 @@ def get_conf():
         try:
             encr_js = f.read()
             decr_js = simplecrypt.decrypt(password, encr_js)
+            logger.debug('Fresh decrypted string: {0}'.format(decr_js))
+
             js = decr_js.decode('utf8')
+            logger.debug('Decoded JSON is {0}'.format(js))
+
             js_dict = json.loads(js)
             api = js_dict['api']
             cust_id = js_dict['id']
