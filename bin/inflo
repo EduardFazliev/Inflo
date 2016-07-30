@@ -17,9 +17,19 @@ def invoke_get_tenant_info(args):
 def invoke_server_list(args):
     inflo.server_list(args.api_key, args.customer_id, args.raw)
 
+def invoke_os_list(args):
+    inflo.os_list(args.api_key, args.customer_id)
+
+
+def set_logger(verbosity):
+    if verbosity:
+        logger = logging.basicConfig(level=logging.DEBUG)
+    else:
+        logger = logging.basicConfig(level=logging.INFO)
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true', help='Increase verbosity.')
 
     subparsers = parser.add_subparsers()
 
@@ -34,6 +44,11 @@ def main():
     tenant_info.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
     tenant_info.set_defaults(func=invoke_get_tenant_info)
 
+    os_list = subparsers.add_parser('os-list', help='Get tenant info.')
+    os_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    os_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    os_list.set_defaults(func=invoke_os_list)
+
     server_list = subparsers.add_parser('server-list', help='Get list of existing servers.')
     server_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
     server_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
@@ -41,8 +56,8 @@ def main():
     server_list.set_defaults(func=invoke_server_list)
 
     args = parser.parse_args()
+    set_logger(args.verbose)
     args.func(args)
 
 if __name__ == '__main__':
-    logger = logging.basicConfig(level=logging.DEBUG)
     main()
