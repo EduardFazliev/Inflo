@@ -15,7 +15,7 @@ def invoke_get_tenant_info(args):
 
 
 def invoke_server_list(args):
-    inflo.servers_list(args.api_key, args.customer_id, args.raw)
+    inflo.server_list(args.api_key, args.customer_id, args.raw)
 
 
 def main():
