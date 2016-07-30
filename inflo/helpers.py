@@ -37,13 +37,13 @@ def set_conf(ext_api, ext_id):
     cust_id = str_check(ext_id, 'Customer ID')
 
     # Safely get password and encrypt API key and customer ID to save in temp file.
-    password = getpass.getpass('Please type password to protect your API key and customer ID.')
+    password = getpass.getpass('Please type password to protect your API key and customer ID: ')
 
-    js = "{api: '{0}', id: '{1}'}".format(ext_api, ext_id)
+    js = "{'api': '{0}', 'id': '{1}'}".format(api, cust_id)
     encr_js = simplecrypt.encrypt(password, js)
 
     with open(filename, 'wb') as f:
-        f.write(js)
+        f.write(encr_js)
 
     logger.debug('API and ID successfully encrypted and stored to file.')
 
