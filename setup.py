@@ -12,6 +12,7 @@ setup(
         scripts=['bin/inflo'],
         install_requires=[
             'requests',
-            'simple-crypt'
+            'simple-crypt',
+            'prettytable'
         ]
 )

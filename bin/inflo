@@ -11,11 +11,16 @@ def invoke_store_conf(args):
 
 
 def invoke_get_tenant_info(args):
-    inflo.get_tenant_info(args.password)
+    inflo.get_tenant_info(args.api_key, args.customer_id)
+
+
+def invoke_server_list(args)
+    inflo.servers_list(args.api_key, args.customer_id, args.raw)
 
 
 def main():
     parser = argparse.ArgumentParser()
+
     subparsers = parser.add_subparsers()
 
     configure = subparsers.add_parser('configure', help='Set API key and client id. '
@@ -25,9 +30,15 @@ def main():
     configure.set_defaults(func=invoke_store_conf)
 
     tenant_info = subparsers.add_parser('tenant-info', help='Get tenant info.')
-    tenant_info.add_argument('-p', '--password', action='store_true', help='Use previously set password or'
-                                                                           'insert API and ID manually.')
+    tenant_info.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    tenant_info.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
     tenant_info.set_defaults(func=invoke_get_tenant_info)
+
+    server_list = subparsers.add_parser('server-list', help='Get list of existing servers.')
+    server_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    server_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    server_list.add_argument('-r', '--raw', action='store_true, help='Choose for raw json output.')
+    server_list.set_defaults(func=invoke_server_list)
 
     args = parser.parse_args()
     args.func(args)
