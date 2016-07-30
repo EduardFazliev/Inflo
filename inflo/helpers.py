@@ -1,7 +1,5 @@
 import getpass
 import logging
-import os
-import random
 
 import simplecrypt
 import sys
