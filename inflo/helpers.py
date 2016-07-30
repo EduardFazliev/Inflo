@@ -1,4 +1,5 @@
 import getpass
+import json
 import logging
 
 import simplecrypt
@@ -38,11 +39,12 @@ def set_conf(ext_api, ext_id):
     # Safely get password and encrypt API key and customer ID to save in temp file.
     password = getpass.getpass('Please type password to protect your API key and customer ID.')
 
-    encr_api = simplecrypt.encrypt(password, api)
-    encr_id = simplecrypt.encrypt(password, cust_id)
+    js = "{api: '{0}', id: '{1}'}".format(ext_api, ext_id)
+    encr_js = simplecrypt.encrypt(password, js)
+
     with open(filename, 'wb') as f:
-        f.write(encr_api)
-        f.write(encr_id)
+        f.write(js)
+
     logger.debug('API and ID successfully encrypted and stored to file.')
 
 
@@ -51,8 +53,12 @@ def get_conf():
 
     with open(filename, 'rb') as f:
         try:
-            api = simplecrypt.decrypt(password, f.readline().rstrip('\n')).decode('utf-8')
-            cust_id = simplecrypt.decrypt(password, f.readline().rstrip('\n')).decode('utf-8')
+            encr_js = f.read()
+            decr_js = simplecrypt.decrypt(password, encr_js)
+            js = decr_js.decode('utf8')
+            js_dict = json.loads(js)
+            api = js_dict['api']
+            cust_id = js_dict['id']
         except Exception as e:
             logger.debug('Error occured while decrypting API and ID: {0}'.format(e))
             print 'Wrong password, sorry dude... bye!'
