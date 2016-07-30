@@ -30,6 +30,8 @@ def get_tenant_info(api_key=None, customer_id=None):
     pt.add_column('id', [tenant['id'] for tenant in result])
     pt.add_column('description', [tenant['description'] for tenant in result])
 
+    print pt
+
 
 def server_list(api_key=None, customer_id=None, raw=False):
     url = api_link + 'vm'
