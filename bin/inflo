@@ -14,7 +14,7 @@ def invoke_get_tenant_info(args):
     inflo.get_tenant_info(args.api_key, args.customer_id)
 
 
-def invoke_server_list(args)
+def invoke_server_list(args):
     inflo.servers_list(args.api_key, args.customer_id, args.raw)
 
 
