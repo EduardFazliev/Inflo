@@ -20,6 +20,32 @@ def invoke_server_list(args):
 def invoke_os_list(args):
     inflo.os_list(args.api_key, args.customer_id)
 
+def invoke_get_vm_info(args):
+    if args.vm_id is None:
+        print 'Please specify the virtual machine id with -m option.'
+    else:
+        inflo.get_vm_info(args.api_key, args.customer_id, args.vm_id, args.raw)
+
+def invoke_get_vm_snapshots(args):
+    if args.vm_id is None:
+        print 'Please specify the virtual machine id with -m option.'
+    else:
+        inflo.get_vm_snapshots(args.api_key, args.customer_id, args.vm_id)
+
+def invoke_get_vm_backups(args):
+    if args.vm_id is None:
+        print 'Please specify the virtual machine id with -m option.'
+    else:
+        inflo.get_vm_backups(args.api_key, args.customer_id, args.vm_id)
+
+def invoke_get_pubkeys(args):
+    inflo.get_pubkeys(args.api_key, args.customer_id)
+
+def invoke_get_software(args):
+    inflo.get_software(args.api_key, args.customer_id)
+
+def invoke_get_tariffs(args):
+    inflo.get_tariffs(args.api_key, args.customer_id)
 
 def set_logger(verbosity):
     if verbosity:
@@ -54,6 +80,35 @@ def main():
     server_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
     server_list.add_argument('-r', '--raw', action='store_true', help='Choose for raw json output.')
     server_list.set_defaults(func=invoke_server_list)
+
+    vm_info = subparsers.add_parser('vm-info', help='Get virtual machine info from given vm-id.')
+    vm_info.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    vm_info.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    vm_info.add_argument('-r', '--raw', action='store_true', help='Choose for raw json output.')
+    vm_info.add_argument('-m', '--vm-id', type=str, help='Virtual machine ID.', default=None)
+    vm_info.set_defaults(func=invoke_get_vm_info)
+
+    vm_snapshots = subparsers.add_parser('vmsnapshot-list', help='Get virtual machine snapshot list.')
+    vm_snapshots.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    vm_snapshots.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    vm_snapshots.add_argument('-m', '--vm-id', type=str, help='Virtual machine ID.', default=None)
+    vm_snapshots.set_defaults(func=invoke_get_vm_snapshots)
+
+    vm_backup = subparsers.add_parser('vmbackup-list', help='Get virtual machine backup list.')
+    vm_backup.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    vm_backup.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    vm_backup.add_argument('-m', '--vm-id', type=str, help='Virtual machine ID.', default=None)
+    vm_backup.set_defaults(func=invoke_get_vm_backups)
+
+    software_list = subparsers.add_parser('software-list', help='Get available software list.')
+    software_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    software_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    software_list.set_defaults(func=invoke_get_software)
+
+    tariff_list = subparsers.add_parser('tariff-list', help='Get available tariff list.')
+    tariff_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    tariff_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    tariff_list.set_defaults(func=invoke_get_tariffs)
 
     args = parser.parse_args()
     set_logger(args.verbose)
