@@ -7,6 +7,27 @@ import requests_lib
 api_link = 'https://api.flops.ru/api/v1/'
 
 
+def print_out(answer, headers):
+    status = answer['status']
+    result = answer['result']
+
+    print '''
+    #-#-#-#-#
+    -> Status: {0}
+    -> Result:
+    '''.format(status)
+
+    pt = prettytable.PrettyTable()
+    for header in headers:
+        if type(header) == tuple:
+            if header[0] == 2:
+                pt.add_column(header[2], [subject[header[1]][header[2]] for subject in result])
+        else:
+            pt.add_column(header, [subject[header] for subject in result])
+
+    print pt
+
+
 def get_tenant_info(api_key=None, customer_id=None):
     url = '{0}/tenant/'.format(api_link)
     if api_key or customer_id is None:
@@ -18,18 +39,7 @@ def get_tenant_info(api_key=None, customer_id=None):
 
     answer = json.loads(message)
 
-    print '''
-    Status: {0}
-    ++++++++++++++++++++
-    '''.format(answer['status'])
-
-    pt = prettytable.PrettyTable()
-
-    result = answer['result']
-    pt.add_column('id', [tenant['id'] for tenant in result])
-    pt.add_column('description', [tenant['description'] for tenant in result])
-
-    print pt
+    print_out(answer, ['id', 'description'])
 
 
 def server_list(api_key=None, customer_id=None, raw=False):
@@ -43,26 +53,10 @@ def server_list(api_key=None, customer_id=None, raw=False):
 
     answer = json.loads(message)
 
-    print '''
-    Status: {0}
-    ++++++++++++++++++++
-    '''.format(answer['status'])
-
-    if not raw:
-        pt = prettytable.PrettyTable()
-        result = answer['result']
-
-        pt.add_column('id', [server['id'] for server in result])
-        pt.add_column('name', [server['name'] for server in result])
-        pt.add_column('memory', [server['memory'] for server in result])
-        pt.add_column('disk', [server['disk'] for server in result])
-        pt.add_column('cpu', [server['cpu'] for server in result])
-        pt.add_column('ip', [server['ipAddresses'] for server in result])
-        pt.add_column('os', [server['distribution']['name'] for server in result])
-
-        print pt
-    else:
+    if raw:
         print message
+    else:
+        print_out(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipAddresses', (2, 'distribution', 'name')])
 
 
 def os_list(api_key=None, customer_id=None):
@@ -73,23 +67,9 @@ def os_list(api_key=None, customer_id=None):
     payload = {'clientId': customer_id, 'apiKey': api_key}
 
     code, message = requests_lib.send_get_request(url, payload)
-
     answer = json.loads(message)
 
-    print '''
-    -> Status: {0}
-    -> Printing result...
-    '''.format(answer['status'])
-
-    pt = prettytable.PrettyTable()
-    result = answer['result']
-
-    pt.add_column('id', [server['id'] for server in result])
-    pt.add_column('name', [server['name'] for server in result])
-    pt.add_column('description', [server['description'] for server in result])
-    pt.add_column('bitness', [server['bitness'] for server in result])
-
-    print pt
+    print_out(answer, ['id', 'name', 'description', 'bitness'])
 
 
 def get_vm_info(api_key=None, customer_id=None, vm_id=str, raw=False):
@@ -102,31 +82,11 @@ def get_vm_info(api_key=None, customer_id=None, vm_id=str, raw=False):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print '''
-    -> Status: {0}
-    -> Printing result...
-    '''.format(answer['status'])
-
-    if not raw:
-
-        pt = prettytable.PrettyTable()
-        result = answer['result']
-
-        pt.add_column('id', [server['id'] for server in result])
-        pt.add_column('name', [server['name'] for server in result])
-        pt.add_column('cpu', [server['cpu'] for server in result])
-        pt.add_column('memory', [server['memory'] for server in result])
-        pt.add_column('disk', [server['disk'] for server in result])
-        pt.add_column('bandwidth', [server['bandwidth'] for server in result])
-        pt.add_column('ipAddresses', [server['ipAddresses'] for server in result])
-        pt.add_column('privateIpAddress', [server['privateIpAddress'] for server in result])
-        pt.add_column('state', [server['state'] for server in result])
-        # TODO: Convert Unix time to standard one.
-        pt.add_column('timeAdded', [server['timeAdded'] for server in result])
-        pt.add_column('distribution', [server['distribution'] for server in result])
-
-    else:
+    if raw:
         print message
+    else:
+        print_out(answer, ['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddresses',
+                           'state', 'timeAdded', (2, 'distribution', 'name')])
 
 
 def get_vm_snapshots(api_key=None, customer_id=None, vm_id=str):
@@ -139,20 +99,7 @@ def get_vm_snapshots(api_key=None, customer_id=None, vm_id=str):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print '''
-    -> Status: {0}
-    -> Printing result...
-    '''.format(answer['status'])
-
-    pt = prettytable.PrettyTable()
-    result = answer['result']
-
-    pt.add_column('id', [server['id'] for server in result])
-    pt.add_column('name', [server['name'] for server in result])
-    pt.add_column('description', [server['description'] for server in result])
-    pt.add_column('parentSnapshotId', [server['parentSnapshotId'] for server in result])
-    # TODO: Convert Unix time to standard one.
-    pt.add_column('timeAdded', [server['timeAdded'] for server in result])
+    print_out(answer, ['id', 'name', 'description', 'bitness', 'parentSnapshotId', 'timeAdded'])
 
 
 def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
@@ -165,18 +112,7 @@ def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print '''
-    -> Status: {0}
-    -> Printing result...
-    '''.format(answer['status'])
-
-    pt = prettytable.PrettyTable()
-    result = answer['result']
-
-    pt.add_column('id', [server['id'] for server in result])
-    pt.add_column('size', [server['size'] for server in result])
-    # TODO: Convert Unix time to standard one.
-    pt.add_column('timeAdded', [server['timeAdded'] for server in result])
+    print_out(answer, ['id', 'size', 'timeAdded'])
 
 
 def get_pubkeys(api_key=None, customer_id=None):
@@ -189,20 +125,7 @@ def get_pubkeys(api_key=None, customer_id=None):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print '''
-    -> Status: {0}
-    -> Printing result...
-    '''.format(answer['status'])
-
-    pt = prettytable.PrettyTable()
-    result = answer['result']
-
-    pt.add_column('id', [server['id'] for server in result])
-    pt.add_column('name', [server['name'] for server in result])
-    pt.add_column('type', [server['type'] for server in result])
-    pt.add_column('publicKey', [server['publicKey'] for server in result])
-    # TODO: Convert Unix time to standard one.
-    pt.add_column('timeAdded', [server['timeAdded'] for server in result])
+    print_out(answer, ['id', 'name', 'type', 'publicKey', 'timeAdded'])
 
 
 def get_software(api_key=None, customer_id=None):
@@ -215,16 +138,7 @@ def get_software(api_key=None, customer_id=None):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print '''
-    -> Status: {0}
-    -> Printing result...
-    '''.format(answer['status'])
-
-    pt = prettytable.PrettyTable()
-    result = answer['result']
-
-    pt.add_column('id', [server['id'] for server in result])
-    pt.add_column('name', [server['name'] for server in result])
+    print_out(answer, ['id', 'name'])
 
 
 def get_tariffs(api_key=None, customer_id=None):
@@ -237,22 +151,7 @@ def get_tariffs(api_key=None, customer_id=None):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print '''
-    -> Status: {0}
-    -> Printing result...
-    '''.format(answer['status'])
-
-    pt = prettytable.PrettyTable()
-    result = answer['result']
-
-    pt.add_column('id', [server['id'] for server in result])
-    pt.add_column('name', [server['name'] for server in result])
-    pt.add_column('memory', [server['memory'] for server in result])
-    pt.add_column('disk', [server['disk'] for server in result])
-    pt.add_column('cpu', [server['cpu'] for server in result])
-    pt.add_column('ipCount', [server['ipCount'] for server in result])
-    pt.add_column('onDemand', [server['onDemand'] for server in result])
-    pt.add_column('forWindows', [server['forWindows'] for server in result])
+    print_out(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipCount', 'onDemand', 'forWindows'])
 
 
 if __name__ == '__main__':
