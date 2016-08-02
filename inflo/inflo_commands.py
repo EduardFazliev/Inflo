@@ -180,7 +180,6 @@ def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
 
 
 def get_pubkeys(api_key=None, customer_id=None):
-    url = api_link + 'pubkeys'
     url = '{0}/pubkeys/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
