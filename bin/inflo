@@ -64,9 +64,12 @@ def invoke_delete_vm(args):
 
 def set_logger(verbosity):
     if verbosity:
-        logger = logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG)
     else:
-        logger = logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO)
+
+    logger = logging.getLogger()
+
 
 def main():
     parser = argparse.ArgumentParser()
