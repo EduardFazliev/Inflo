@@ -175,6 +175,8 @@ def get_tariffs(api_key=None, customer_id=None):
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
               open_support_access, public_key_id, software_id, api_key=None, customer_id=None):
     url = '{0}/vm/install/'.format(api_key)
+    if api_key or customer_id is None:
+        api_key, customer_id = helpers.get_conf()
 
     payload = {
         'clientId': customer_id,
@@ -202,6 +204,8 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
 def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
     url = '{0}/vm/{1}/delete'.format(api_link, vm_id)
+    if api_key or customer_id is None:
+        api_key, customer_id = helpers.get_conf()
 
     payload = {'tenantId': tenant_id}
 
