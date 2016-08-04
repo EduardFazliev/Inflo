@@ -149,8 +149,8 @@ def main():
     create_vm.set_defaults(func=invoke_create_vm)
 
     delete_vm = subparsers.add_parser('delete_vm', help='Delete server.')
-    create_vm.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
-    create_vm.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    delete_vm.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    delete_vm.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
     delete_vm.add_argument('--vm-id', type=int, help='Virtual server ID to delete.')
     delete_vm.add_argument('--tenant-id', type=int, help='Tenant ID.')
     delete_vm.set_defaults(func=invoke_delete_vm)

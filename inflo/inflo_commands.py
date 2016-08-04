@@ -198,5 +198,15 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
     print_result(answer, ['result', 'operationId'])
 
 
+def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
+    url = '{0}/vm/{1}/delete'.format(api_link, vm_id)
+
+    payload = {'tenantId': tenant_id}
+
+    code, message = requests_lib.send_get_request(url, payload)
+    answer = json.loads(message)
+
+    print_result(answer, ['operationId'])
+
 if __name__ == '__main__':
     pass
