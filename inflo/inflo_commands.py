@@ -7,7 +7,7 @@ import requests_lib
 api_link = 'https://api.flops.ru/api/v1/'
 
 
-def print_out(answer, headers):
+def print_info(answer, headers):
     status = answer['status']
     result = answer['result']
 
@@ -28,6 +28,22 @@ def print_out(answer, headers):
     print pt
 
 
+def print_result(answer, headers):
+    status = answer['status']
+
+    print '''
+    #-#-#-#-#
+    -> Status: {0}
+    -> Result:
+    '''.format(status)
+
+    pt = prettytable.PrettyTable()
+    for header in headers:
+        pt.add_column(answer[header])
+
+    print pt
+
+
 def get_tenant_info(api_key=None, customer_id=None):
     url = '{0}/tenant/'.format(api_link)
     if api_key or customer_id is None:
@@ -39,7 +55,7 @@ def get_tenant_info(api_key=None, customer_id=None):
 
     answer = json.loads(message)
 
-    print_out(answer, ['id', 'description'])
+    print_info(answer, ['id', 'description'])
 
 
 def server_list(api_key=None, customer_id=None, raw=False):
@@ -56,7 +72,7 @@ def server_list(api_key=None, customer_id=None, raw=False):
     if raw:
         print message
     else:
-        print_out(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipAddresses', (2, 'distribution', 'name')])
+        print_info(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipAddresses', (2, 'distribution', 'name')])
 
 
 def os_list(api_key=None, customer_id=None):
@@ -69,7 +85,7 @@ def os_list(api_key=None, customer_id=None):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_out(answer, ['id', 'name', 'description', 'bitness'])
+    print_info(answer, ['id', 'name', 'description', 'bitness'])
 
 
 def get_vm_info(api_key=None, customer_id=None, vm_id=str, raw=False):
@@ -85,7 +101,7 @@ def get_vm_info(api_key=None, customer_id=None, vm_id=str, raw=False):
     if raw:
         print message
     else:
-        print_out(answer, ['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddresses',
+        print_info(answer, ['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddresses',
                            'state', 'timeAdded', (2, 'distribution', 'name')])
 
 
@@ -99,7 +115,7 @@ def get_vm_snapshots(api_key=None, customer_id=None, vm_id=str):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_out(answer, ['id', 'name', 'description', 'bitness', 'parentSnapshotId', 'timeAdded'])
+    print_info(answer, ['id', 'name', 'description', 'bitness', 'parentSnapshotId', 'timeAdded'])
 
 
 def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
@@ -112,7 +128,7 @@ def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_out(answer, ['id', 'size', 'timeAdded'])
+    print_info(answer, ['id', 'size', 'timeAdded'])
 
 
 def get_pubkeys(api_key=None, customer_id=None):
@@ -125,7 +141,7 @@ def get_pubkeys(api_key=None, customer_id=None):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_out(answer, ['id', 'name', 'type', 'publicKey', 'timeAdded'])
+    print_info(answer, ['id', 'name', 'type', 'publicKey', 'timeAdded'])
 
 
 def get_software(api_key=None, customer_id=None):
@@ -138,7 +154,7 @@ def get_software(api_key=None, customer_id=None):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_out(answer, ['id', 'name'])
+    print_info(answer, ['id', 'name'])
 
 
 def get_tariffs(api_key=None, customer_id=None):
@@ -151,7 +167,35 @@ def get_tariffs(api_key=None, customer_id=None):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_out(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipCount', 'onDemand', 'forWindows'])
+    print_info(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipCount', 'onDemand', 'forWindows'])
+
+
+def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
+              open_support_access, public_key_id, software_id, api_key=None, customer_id=None):
+    url = '{0}/vm/install/'.format(api_key)
+
+    payload = {
+        'clientId': customer_id,
+        'apiKey': api_key,
+        'name': name,
+        'tenantId': tenant_id,
+        'distributionId': distr_id,
+        'tariffId': tariff_id,
+        'memory': memory,
+        'disk': disk,
+        'cpu': cpu,
+        'ipCount': ip_count,
+        'password': password,
+        'sendPassword': send_password,
+        'openSupportAccess': open_support_access,
+        'publicKeyIds': public_key_id,
+        'softwareIds': software_id
+    }
+
+    code, message = requests_lib.send_get_request(url, payload)
+    answer = json.loads(message)
+
+    print_result(answer, ['result', 'operationId'])
 
 
 if __name__ == '__main__':
