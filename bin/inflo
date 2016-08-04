@@ -143,10 +143,11 @@ def main():
                                                         'letters and at least one of symbols ("!","(",")","[","]","-",'
                                                         '".","?","~","`")', default='hurma228')
     create_vm.add_argument('--send-password', action='store_true', help='Send password on email.')
-    create_vm.add_argument('--open-support-access', action='store_true', help='Open access to virtual server to support')
+    create_vm.add_argument('--open-support-access', action='store_true', help='Open access to virtual'
+                                                                              'server to support.')
     create_vm.add_argument('--public-key-id', type=str, help='Public key to add ID. You can obtain list of available'
-                                                             'public keys via command "pk-list".')
-    create_vm.add_argument('--software-id', type=str, help='List of available software.')
+                                                             'public keys via command "pk-list".', default='')
+    create_vm.add_argument('--software-id', type=str, help='List of available software.', default='')
     create_vm.set_defaults(func=invoke_create_vm)
 
     delete_vm = subparsers.add_parser('delete_vm', help='Delete server.')
