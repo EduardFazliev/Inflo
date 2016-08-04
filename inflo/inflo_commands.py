@@ -174,7 +174,8 @@ def get_tariffs(api_key=None, customer_id=None):
 
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
               open_support_access, public_key_id, software_id, api_key=None, customer_id=None):
-    url = '{0}/vm/install/'.format(api_key)
+    url = '{0}/vm/install/'.format(api_link)
+    url = '{0}/vm/install/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
