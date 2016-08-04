@@ -7,7 +7,7 @@ import helpers
 import requests_lib
 
 api_link = 'https://api.flops.ru/api/v1/'
-
+logger = logging.getLogger(__name__)
 
 def print_info(answer, headers):
     status = answer['status']
@@ -41,7 +41,12 @@ def print_result(answer, headers):
 
     pt = prettytable.PrettyTable()
     for header in headers:
-        pt.add_column(answer[header])
+        try:
+            pt.add_column(answer[header])
+        except Exception as e:
+            print 'Can not add key {0}'.format(header)
+            print answer
+            logger.debug(e)
 
     print pt
 
