@@ -127,8 +127,8 @@ def main():
     tariff_list.set_defaults(func=invoke_get_tariffs)
 
     create_vm = subparsers.add_parser('create-vm', help='Create virtual server.')
-    create_vm.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
-    create_vm.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    create_vm.add_argument('-a', '--api-key', type=str, help='API key.')
+    create_vm.add_argument('-i', '--customer-id', type=str, help='Client ID.')
     create_vm.add_argument('--name', type=str, help='Name of virtual server.', default='inflo_created_test_vm')
     create_vm.add_argument('--tenant-id', type=str, help='Tenant(project) ID.', default=28194)
     create_vm.add_argument('--distr-id', type=int, help='Number of distribution ID. List of distributions can be'
