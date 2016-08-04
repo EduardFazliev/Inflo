@@ -140,7 +140,7 @@ def main():
     create_vm.add_argument('--ip-count', type=int, help='Number of IP addresses, from 0 to 2.', default=1)
     create_vm.add_argument('--password', type=str, help='Password to server, must contain capital and small latin'
                                                         'letters and at least one of symbols ("!","(",")","[","]","-",'
-                                                        '".","?","~","`")', 'hurma228')
+                                                        '".","?","~","`")', default='hurma228')
     create_vm.add_argument('--send-password', action='store_true', help='Send password on email.')
     create_vm.add_argument('--open-support-access', action='store_true', help='Open access to virtual server to support')
     create_vm.add_argument('--public-key-id', type=str, help='Public key to add ID. You can obtain list of available'
