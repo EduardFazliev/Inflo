@@ -54,6 +54,7 @@ def invoke_create_vm(args):
         print 'HDD/MEMORY must be equal or great than 64. Exiting...'
         sys.exit(0)
     else:
+        logger.debug('Args list for create virtual server:\n{0}'.format(args))
         inflo.create_vm(args.api_key, args.customer_id, args.name, args.tenant_id, args.distr_id, args.tariff_id,
                         args.memory, args.disk, args.cpu, args.ip_count, args.password, args.send_password,
                         args.open_support_access, args.public_key_id, args.software_id)

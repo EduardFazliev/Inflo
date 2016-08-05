@@ -180,8 +180,12 @@ def get_tariffs(api_key=None, customer_id=None):
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
               open_support_access, public_key_id, software_id, api_key=None, customer_id=None):
     url = '{0}/vm/install/'.format(api_link)
+    logger.debug('URL for create-vm: {0}'.format(url))
     if api_key or customer_id is None:
+        logger.debug('API key and customer ID is not provided, so trying to get them from file...')
         api_key, customer_id = helpers.get_conf()
+    else:
+        logger.debug('API key and customer ID provided.')
 
     payload = {
         'clientId': customer_id,
@@ -200,9 +204,11 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
         'publicKeyIds': public_key_id,
         'softwareIds': software_id
     }
+    logger.debug('Payload for sending get request to create virtual server is formed: {0}'.format(payload))
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
+    logger.debug('Response is received:\nCode: {0}\nMessage: {1}'.format(code, message))
 
     print_result(answer, ['result', 'operationId'])
 
