@@ -52,7 +52,7 @@ def print_result(answer, headers):
 
 
 def get_tenant_info(api_key=None, customer_id=None):
-    url = '{0}/tenant/'.format(api_link)
+    url = '{0}tenant/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -66,7 +66,7 @@ def get_tenant_info(api_key=None, customer_id=None):
 
 
 def server_list(api_key=None, customer_id=None, raw=False):
-    url = '{0}/vm/'.format(api_link)
+    url = '{0}vm/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -83,7 +83,7 @@ def server_list(api_key=None, customer_id=None, raw=False):
 
 
 def os_list(api_key=None, customer_id=None):
-    url = '{0}/distribution/'.format(api_link)
+    url = '{0}distribution/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -96,7 +96,7 @@ def os_list(api_key=None, customer_id=None):
 
 
 def get_vm_info(api_key=None, customer_id=None, vm_id=str, raw=False):
-    url = '{0}/vm/{1}/'.format(api_link, vm_id)
+    url = '{0}vm/{1}/'.format(api_link, vm_id)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -113,7 +113,7 @@ def get_vm_info(api_key=None, customer_id=None, vm_id=str, raw=False):
 
 
 def get_vm_snapshots(api_key=None, customer_id=None, vm_id=str):
-    url = '{0}/vm/{1}/snapshots/'.format(api_link, vm_id)
+    url = '{0}vm/{1}/snapshots/'.format(api_link, vm_id)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -126,7 +126,7 @@ def get_vm_snapshots(api_key=None, customer_id=None, vm_id=str):
 
 
 def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
-    url = '{0}/vm/{1}/backups/'.format(api_link, vm_id)
+    url = '{0}vm/{1}/backups/'.format(api_link, vm_id)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -139,7 +139,7 @@ def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
 
 
 def get_pubkeys(api_key=None, customer_id=None):
-    url = '{0}/pubkeys/'.format(api_link)
+    url = '{0}pubkeys/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -152,7 +152,7 @@ def get_pubkeys(api_key=None, customer_id=None):
 
 
 def get_software(api_key=None, customer_id=None):
-    url = '{0}/software/'.format(api_link)
+    url = '{0}software/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -165,7 +165,7 @@ def get_software(api_key=None, customer_id=None):
 
 
 def get_tariffs(api_key=None, customer_id=None):
-    url = '{0}/tariffs/'.format(api_link)
+    url = '{0}tariffs/'.format(api_link)
     if api_key or customer_id is None:
         api_key, customer_id = helpers.get_conf()
 
@@ -179,9 +179,9 @@ def get_tariffs(api_key=None, customer_id=None):
 
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
               open_support_access, public_key_id, software_id, api_key=None, customer_id=None):
-    url = '{0}/vm/install/'.format(api_link)
+    url = '{0}vm/install/'.format(api_link)
     logger.debug('URL for create-vm: {0}'.format(url))
-    if api_key or customer_id is None:
+    if api_key or customer_id in [None, '']:
         logger.debug('API key and customer ID is not provided, so trying to get them from file...')
         api_key, customer_id = helpers.get_conf()
     else:
@@ -214,8 +214,8 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
 
 def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
-    url = '{0}/vm/{1}/delete'.format(api_link, vm_id)
-    if api_key or customer_id is None:
+    url = '{0}vm/{1}/delete'.format(api_link, vm_id)
+    if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
     payload = {'tenantId': tenant_id}
