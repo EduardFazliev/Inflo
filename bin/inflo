@@ -25,7 +25,7 @@ def invoke_get_vm_info(args):
     if args.vm_id is None:
         print 'Please specify the virtual machine id with -m option.'
     else:
-        inflo.get_vm_info(args.api_key, args.customer_id, args.vm_id, args.raw)
+        inflo.get_vm_info(args.vm_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
 
 def invoke_get_vm_snapshots(args):
     if args.vm_id is None:

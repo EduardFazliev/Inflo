@@ -9,9 +9,20 @@ import requests_lib
 api_link = 'https://api.flops.ru/api/v1/'
 logger = logging.getLogger(__name__)
 
+
 def print_info(answer, headers):
-    status = answer['status']
-    result = answer['result']
+    try:
+        status = answer['status']
+    except KeyError:
+        err_message = 'Error: No "Status" received!'
+        print err_message
+        return -1, err_message
+    try:
+        result = answer['result']
+    except KeyError:
+        err_message = 'Error: No "Result" received!'
+        print err_message
+        return -1, err_message
 
     print '''
     #-#-#-#-#
@@ -95,7 +106,7 @@ def os_list(api_key=None, customer_id=None):
     print_info(answer, ['id', 'name', 'description', 'bitness'])
 
 
-def get_vm_info(api_key=None, customer_id=None, vm_id=str, raw=False):
+def get_vm_info(vm_id, api_key=None, customer_id=None, raw=False):
     url = '{0}vm/{1}/'.format(api_link, vm_id)
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
@@ -221,10 +232,11 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
 
     payload = {'clientId': customer_id, 'apiKey': api_key, 'tenantId': tenant_id}
 
-    code, message = requests_lib.send_get_request(url, payload)
-    answer = json.loads(message)
+    print 'At the moment I would not delete any VM...'
+    # сode, message = requests_lib.send_get_request(url, payload)
+    # answer = json.loads(message)
 
-    print_result(answer, ['operationId'])
+    # print_result(answer, ['operationId'])
 
 if __name__ == '__main__':
     pass
