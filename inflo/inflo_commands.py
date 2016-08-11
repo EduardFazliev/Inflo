@@ -2,12 +2,14 @@ import json
 import logging
 
 import prettytable
+import sys
 
 import helpers
 import requests_lib
 
 api_link = 'https://api.flops.ru/api/v1/'
 logger = logging.getLogger(__name__)
+inflo_delete_key = 'inflo_created_'
 
 
 def print_info(answer, headers):
@@ -90,7 +92,7 @@ def server_list(api_key=None, customer_id=None, raw=False):
     if raw:
         print message
     else:
-        print_info(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipAddresses', (2, 'distribution', 'name')])
+        print_info(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipAddresses', ('2', 'distribution', 'name')])
 
 
 def os_list(api_key=None, customer_id=None):
@@ -118,6 +120,7 @@ def get_vm_info(vm_id, api_key=None, customer_id=None, raw=False):
 
     if raw:
         print message
+        return message
     else:
         print_info(answer, ['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddresses',
                             'state', 'timeAdded', (2, 'distribution', 'name')])
@@ -225,18 +228,32 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
 
 def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
-
     url = '{0}vm/{1}/delete'.format(api_link, vm_id)
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
+    # Getting info in raw(json) format.
+    info_raw = get_vm_info(vm_id, api_key=api_key, customer_id=customer_id, raw=True)
+    info = json.loads(info_raw)
+    status = info['result']['name']
+    if status != 'OK':
+        print 'Can not get virtual server name to check. Not deleting VM.'
+        sys.exit(0)
+    else:
+        vm_name = info['result']['name']
+
+    if inflo_delete_key in vm_name:
+        print 'Inflo delete key is found. Deleting vm...'
+    else:
+        print 'Inflo delete key is not found. Not deleting vm...'
+        sys.exit(0)
+
     payload = {'clientId': customer_id, 'apiKey': api_key, 'tenantId': tenant_id}
 
-    print 'At the moment I would not delete any VM...'
-    # сode, message = requests_lib.send_get_request(url, payload)
-    # answer = json.loads(message)
+    сode, message = requests_lib.send_get_request(url, payload)
+    answer = json.loads(message)
 
-    # print_result(answer, ['operationId'])
+    print_result(answer, ['operationId'])
 
 if __name__ == '__main__':
     pass
