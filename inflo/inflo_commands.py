@@ -36,9 +36,25 @@ def print_info(answer, headers):
     for header in headers:
         if type(header) == tuple:
             if header[0] == 2:
-                pt.add_column(header[2], [subject[header[1]][header[2]] for subject in result])
+                try:
+                    pt.add_column(header[2], [subject[header[1]][header[2]] for subject in result])
+                except TypeError:
+                    pt.add_column(header[2], [result[header[1]][header[2]]])
+                except Exception:
+                    print 'Error while generating table of results. Will print raw json result instead.'
+                    print result
+                    logger.exception('Error while adding value to pretty table object.')
+                    sys.exit(0)
         else:
-            pt.add_column(header, [subject[header] for subject in result])
+            try:
+                pt.add_column(header, [subject[header] for subject in result])
+            except TypeError:
+                pt.add_column(header, [result[header]])
+            except Exception:
+                print 'Error while generating table of results. Will print raw json result instead.'
+                print result
+                logger.exception('Error while adding value to pretty table object.')
+                sys.exit(0)
 
     print pt
 
@@ -110,7 +126,7 @@ def os_list(api_key=None, customer_id=None):
 
 def get_vm_info(vm_id, api_key=None, customer_id=None, raw=False):
     url = '{0}vm/{1}/'.format(api_link, vm_id)
-    if api_key or customer_id in [None, '']:
+    if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
     payload = {'clientId': customer_id, 'apiKey': api_key}
@@ -122,7 +138,7 @@ def get_vm_info(vm_id, api_key=None, customer_id=None, raw=False):
         print message
         return message
     else:
-        print_info(answer, ['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddresses',
+        print_info(answer, ['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddress',
                             'state', 'timeAdded', (2, 'distribution', 'name')])
 
 
@@ -256,4 +272,5 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
     print_result(answer, ['operationId'])
 
 if __name__ == '__main__':
+    get_vm_info(106247, api_key="dPjbuf6s3FeNQLmORNSbHJ2I05ZGjOaqQ", customer_id="16596", raw=False)
     pass
