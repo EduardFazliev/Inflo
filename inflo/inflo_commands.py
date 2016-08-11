@@ -111,7 +111,7 @@ def get_vm_info(vm_id, api_key=None, customer_id=None, raw=False):
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientID': customer_id, 'apiKey': api_key}
+    payload = {'clientId': customer_id, 'apiKey': api_key}
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
@@ -128,7 +128,7 @@ def get_vm_snapshots(api_key=None, customer_id=None, vm_id=str):
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientID': customer_id, 'apiKey': api_key}
+    payload = {'clientId': customer_id, 'apiKey': api_key}
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
@@ -141,7 +141,7 @@ def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientID': customer_id, 'apiKey': api_key}
+    payload = {'clientId': customer_id, 'apiKey': api_key}
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
@@ -154,7 +154,7 @@ def get_pubkeys(api_key=None, customer_id=None):
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientID': customer_id, 'apiKey': api_key}
+    payload = {'clientId': customer_id, 'apiKey': api_key}
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
@@ -167,7 +167,7 @@ def get_software(api_key=None, customer_id=None):
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientID': customer_id, 'apiKey': api_key}
+    payload = {'clientId': customer_id, 'apiKey': api_key}
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
@@ -180,7 +180,7 @@ def get_tariffs(api_key=None, customer_id=None):
     if api_key or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientID': customer_id, 'apiKey': api_key}
+    payload = {'clientId': customer_id, 'apiKey': api_key}
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
