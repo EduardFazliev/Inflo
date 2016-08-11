@@ -250,7 +250,7 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
 
     payload = {'clientId': customer_id, 'apiKey': api_key, 'tenantId': tenant_id}
 
-    сode, message = requests_lib.send_get_request(url, payload)
+    code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
     print_result(answer, ['operationId'])
