@@ -1,8 +1,8 @@
 import argparse
-import inflo
-import unittest
 import mock
-import inflo.parser
+import unittest
+
+import inflo
 
 
 api_key = 'test_key'
@@ -13,7 +13,6 @@ table_format = ['header1', 'header2']
 script_args = ['-a', api_key, '-i', customer_id, 'tenant-info']
 args = argparse.Namespace(api_key=api_key, customer_id=customer_id, raw=False,
                           url='https://api.flops.ru/api/v1/tenant/', table_format=['id', 'description'])
-# args =
 
 
 class TestInflo(unittest.TestCase):
