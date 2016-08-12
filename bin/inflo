@@ -18,8 +18,10 @@ def invoke_get_tenant_info(args):
 def invoke_server_list(args):
     inflo.server_list(args.api_key, args.customer_id, args.raw)
 
+
 def invoke_os_list(args):
     inflo.os_list(args.api_key, args.customer_id)
+
 
 def invoke_get_vm_info(args):
     if args.vm_id is None:
@@ -27,11 +29,13 @@ def invoke_get_vm_info(args):
     else:
         inflo.get_vm_info(args.vm_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
 
+
 def invoke_get_vm_snapshots(args):
     if args.vm_id is None:
         print 'Please specify the virtual machine id with -m option.'
     else:
         inflo.get_vm_snapshots(args.api_key, args.customer_id, args.vm_id)
+
 
 def invoke_get_vm_backups(args):
     if args.vm_id is None:
@@ -39,14 +43,18 @@ def invoke_get_vm_backups(args):
     else:
         inflo.get_vm_backups(args.api_key, args.customer_id, args.vm_id)
 
+
 def invoke_get_pubkeys(args):
-    inflo.get_pubkeys(args.api_key, args.customer_id)
+    inflo.get_pubkeys(api_key=args.api_key, customer_id=args.customer_id, raw = args.raw)
+
 
 def invoke_get_software(args):
     inflo.get_software(args.api_key, args.customer_id)
 
+
 def invoke_get_tariffs(args):
     inflo.get_tariffs(args.api_key, args.customer_id)
+
 
 def invoke_create_vm(args):
     if args.disk/args.memory < 64:
@@ -63,6 +71,11 @@ def invoke_create_vm(args):
 def invoke_delete_vm(args):
     inflo.delete_vm(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id)
 
+
+def invoke_start_vm(args):
+    inflo.start_vm(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id)
+
+
 def set_logger(verbosity):
     if verbosity:
         logging.basicConfig(level=logging.DEBUG)
@@ -73,6 +86,7 @@ def set_logger(verbosity):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--verbose', action='store_true', help='Increase verbosity.')
+    parser.add_argument('-r', '--raw', action='store_true', help='Perform raw json output')
 
     subparsers = parser.add_subparsers()
 
@@ -91,6 +105,12 @@ def main():
     os_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
     os_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
     os_list.set_defaults(func=invoke_os_list)
+
+    pubkey_list = subparsers.add_parser('pubkeys', help='Get list of avaliable pubkeys.')
+    pubkey_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    pubkey_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    pubkey_list.set_default(func=invoke_get_pubkeys)
+
 
     server_list = subparsers.add_parser('server-list', help='Get list of existing servers.')
     server_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
@@ -157,6 +177,13 @@ def main():
     delete_vm.add_argument('--vm-id', type=int, help='Virtual server ID to delete.')
     delete_vm.add_argument('--tenant-id', type=int, help='Tenant ID.')
     delete_vm.set_defaults(func=invoke_delete_vm)
+
+    start_vm = subparsers.add_parser('start-vm', help='Delete server.')
+    start_vm.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
+    start_vm.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
+    start_vm.add_argument('--vm-id', type=int, help='Virtual server ID to delete.')
+    start_vm.add_argument('--tenant-id', type=int, help='Tenant ID.')
+    start_vm.set_defaults(func=invoke_start_vm)
 
     args = parser.parse_args()
     set_logger(args.verbose)
