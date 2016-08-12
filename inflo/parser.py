@@ -108,7 +108,7 @@ def invoke_delete_vm(args):
 
 
 def invoke_start_vm(args):
-    inflo.start_vm(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
+    inflo.start_server(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
 
 
 def set_logger(verbosity):
@@ -199,4 +199,4 @@ def invoke_parser(script_args):
 
 
 if __name__ == '__main__':
-    pass
+    invoke_parser(['-v', 'vm-info', '--vm-id', '106000'])

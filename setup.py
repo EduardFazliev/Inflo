@@ -16,7 +16,7 @@ setup(
             'simple-crypt',
             'prettytable',
         ],
-        tests_requires=[
+        tests_require=[
             'nose',
             'mock'
         ]
