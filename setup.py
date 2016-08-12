@@ -10,9 +10,14 @@ setup(
         author_email='napalmedd@gmail.com',
         description='',
         scripts=['bin/inflo'],
+        test_suite='nose.collector',
         install_requires=[
             'requests',
             'simple-crypt',
-            'prettytable'
+            'prettytable',
+        ],
+        tests_requires=[
+            'nose',
+            'mock'
         ]
 )

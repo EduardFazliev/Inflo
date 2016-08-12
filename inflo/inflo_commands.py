@@ -83,140 +83,24 @@ def print_result(answer, headers):
 
 
 # Information functions #
-def get_tenant_info(api_key=None, customer_id=None):
-    url = '{0}tenant/'.format(api_link)
+def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=None, vm_id=None):
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
     payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-
-    answer = json.loads(message)
-
-    print_info(answer, ['id', 'description'])
-
-
-def server_list(api_key=None, customer_id=None, raw=False):
-    url = '{0}vm/'.format(api_link)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-
-    answer = json.loads(message)
-
-    if raw:
-        print message
-    else:
-        print_info(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipAddresses', ('2', 'distribution', 'name')])
-
-
-def os_list(api_key=None, customer_id=None):
-    url = '{0}distribution/'.format(api_link)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
-
-    print_info(answer, ['id', 'name', 'description', 'bitness'])
-
-
-def get_vm_info(vm_id, api_key=None, customer_id=None, raw=False):
-    url = '{0}vm/{1}/'.format(api_link, vm_id)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-    answer = json.loads(message)
-
     if raw:
         print message
         return message
     else:
-        print_info(answer, ['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddress',
-                            'state', 'timeAdded', (2, 'distribution', 'name')])
-
-
-def get_vm_snapshots(api_key=None, customer_id=None, vm_id=str):
-    url = '{0}vm/{1}/snapshots/'.format(api_link, vm_id)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-    answer = json.loads(message)
-
-    print_info(answer, ['id', 'name', 'description', 'bitness', 'parentSnapshotId', 'timeAdded'])
-
-
-def get_vm_backups(api_key=None, customer_id=None, vm_id=str):
-    url = '{0}vm/{1}/backups/'.format(api_link, vm_id)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-    answer = json.loads(message)
-
-    print_info(answer, ['id', 'size', 'timeAdded'])
-
-
-def get_pubkeys(api_key=None, customer_id=None, raw=False):
-    url = '{0}pubkeys/'.format(api_link)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-    answer = json.loads(message)
-
-    if raw:
-        print message
-    else:
-        print_info(answer, ['id', 'name', 'type', 'publicKey', 'timeAdded'])
-
-
-def get_software(api_key=None, customer_id=None):
-    url = '{0}software/'.format(api_link)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-    answer = json.loads(message)
-
-    print_info(answer, ['id', 'name'])
-
-
-def get_tariffs(api_key=None, customer_id=None):
-    url = '{0}tariffs/'.format(api_link)
-    if api_key in [None, ''] or customer_id in [None, '']:
-        api_key, customer_id = helpers.get_conf()
-
-    payload = {'clientId': customer_id, 'apiKey': api_key}
-
-    code, message = requests_lib.send_get_request(url, payload)
-    answer = json.loads(message)
-
-    print_info(answer, ['id', 'name', 'memory', 'disk', 'cpu', 'ipCount', 'onDemand', 'forWindows'])
-#########################
+        print_info(answer, table_format)
+        return 0
 
 
 # Action functions #
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
-              open_support_access, public_key_id, software_id, api_key=None, customer_id=None):
+              open_support_access, public_key_id, software_id, api_key=None, customer_id=None, raw=False):
     url = '{0}vm/install/'.format(api_link)
     logger.debug('URL for create-vm: {0}'.format(url))
     if api_key in [None, ''] or customer_id in [None, '']:
@@ -251,7 +135,7 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
     print_result(answer, ['result', 'operationId'])
 
 
-def start_server(vm_id, tenant_id, api_key=None, customer_id=None):
+def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
     url = '{0}vm/[vmId]/start/'.format(api_link, vm_id)
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
@@ -264,7 +148,7 @@ def start_server(vm_id, tenant_id, api_key=None, customer_id=None):
     print_result(answer, ['operationId'])
 
 
-def add_pub_key(vm_id, tenant_id, key_ids, api_key=None, customer_id=None):
+def add_pub_key(vm_id, tenant_id, key_ids, api_key=None, customer_id=None, raw=False):
     url = '{0}vm/[vmId]/pubkey_change/'.format(api_link, vm_id)
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
@@ -277,13 +161,13 @@ def add_pub_key(vm_id, tenant_id, key_ids, api_key=None, customer_id=None):
     print_result(answer, ['operationId'])
 
 
-def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None):
+def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
     url = '{0}vm/{1}/delete'.format(api_link, vm_id)
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
     # Getting info in raw(json) format.
-    info_raw = get_vm_info(vm_id, api_key=api_key, customer_id=customer_id, raw=True)
+    info_raw = get_info(vm_id, api_key=api_key, customer_id=customer_id, raw=True)
     info = json.loads(info_raw)
     status = info['result']['name']
     if status != 'OK':
