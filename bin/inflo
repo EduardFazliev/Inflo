@@ -109,7 +109,7 @@ def main():
     pubkey_list = subparsers.add_parser('pubkeys', help='Get list of avaliable pubkeys.')
     pubkey_list.add_argument('-a', '--api-key', type=str, help='API key.', default=None)
     pubkey_list.add_argument('-i', '--customer-id', type=str, help='Client ID.', default=None)
-    pubkey_list.set_default(func=invoke_get_pubkeys)
+    pubkey_list.set_defaults(func=invoke_get_pubkeys)
 
 
     server_list = subparsers.add_parser('server-list', help='Get list of existing servers.')
