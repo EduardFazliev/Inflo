@@ -75,7 +75,7 @@ def invoke_get_vm_backups(args):
 
 
 def invoke_get_pubkeys(args):
-    url = '{0}pubkeys/'.format(api_link, args.vm_id)
+    url = '{0}pubkeys/'.format(api_link)
     inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw = args.raw,  url=url,
                    table_format=['id', 'name', 'type', 'publicKey', 'timeAdded'])
 
