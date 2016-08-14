@@ -1,12 +1,19 @@
 import json
 import logging
+import os
 import sys
 
+from collections import namedtuple
+from ansible.parsing.dataloader import DataLoader
+from ansible.vars import VariableManager
+from ansible.inventory import Inventory
+from ansible.playbook.play import Play
+from ansible.executor.task_queue_manager import TaskQueueManager
+from ansible.plugins.callback import CallbackBase
 import prettytable
 
 import helpers
 import requests_lib
-from parser import api_link
 
 
 logger = logging.getLogger(__name__)
@@ -102,7 +109,7 @@ def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=N
 # Action functions #
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
               open_support_access, public_key_id, software_id, api_key=None, customer_id=None, raw=False):
-    url = '{0}vm/install/'.format(api_link)
+    url = '{0}vm/install/'.format(helpers.api_link)
     logger.debug('URL for create-vm: {0}'.format(url))
     if api_key in [None, ''] or customer_id in [None, '']:
         logger.debug('API key and customer ID is not provided, so trying to get them from file...')
@@ -140,7 +147,7 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
 
 def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
-    url = '{0}vm/[vmId]/start/'.format(api_link, vm_id)
+    url = '{0}vm/[vmId]/start/'.format(helpers.api_link, vm_id)
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
@@ -149,11 +156,14 @@ def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_result(answer, ['operationId'])
+    if raw:
+        print message
+    else:
+        print_result(answer, ['operationId'])
 
 
 def add_pub_key(vm_id, tenant_id, key_ids=[], api_key=None, customer_id=None, raw=False):
-    url = '{0}vm/[vmId]/pubkey_change/'.format(api_link, vm_id)
+    url = '{0}vm/[vmId]/pubkey_change/'.format(helpers.api_link, vm_id)
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
@@ -166,7 +176,7 @@ def add_pub_key(vm_id, tenant_id, key_ids=[], api_key=None, customer_id=None, ra
 
 
 def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
-    url = '{0}vm/{1}/delete'.format(api_link, vm_id)
+    url = '{0}vm/{1}/delete'.format(helpers.api_link, vm_id)
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
@@ -195,7 +205,18 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
         print message
     else:
         print_result(answer, ['operationId'])
+
+
+def get_ip(api_key=None, customer_id=None, vm_id=None):
+    url = '{0}vm/{1}/'.format(helpers.api_link, vm_id)
+    info_json = get_info(api_key=api_key, customer_id=customer_id, vm_id=vm_id, raw=True)
+    info = json.loads(info_json)
+    server_ip = info['result']['ipAddresses'][0]
+    return server_ip
+
+
 ####################
 
-if __name__ == '__main__':   
+
+if __name__ == '__main__':
     pass

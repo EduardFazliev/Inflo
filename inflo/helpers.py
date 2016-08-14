@@ -7,6 +7,7 @@ import sys
 
 logger = logging.getLogger(__name__)
 filename = 'inflo.secret'
+api_link = 'https://api.flops.ru/api/v1/'
 
 
 def str_check(str_assume, str_mean):

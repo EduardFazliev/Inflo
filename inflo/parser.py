@@ -3,10 +3,10 @@ import logging
 import sys
 
 import inflo
+from helpers import api_link
 
 
 logger = logging.getLogger(__name__)
-api_link = 'https://api.flops.ru/api/v1/'
 
 
 def invoke_store_conf(args):

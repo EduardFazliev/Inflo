@@ -15,6 +15,7 @@ setup(
             'requests',
             'simple-crypt',
             'prettytable',
+            'ansible'
         ],
         tests_require=[
             'nose',
