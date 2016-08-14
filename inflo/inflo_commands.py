@@ -1,15 +1,8 @@
 import json
 import logging
-import os
 import sys
 
-from collections import namedtuple
-from ansible.parsing.dataloader import DataLoader
-from ansible.vars import VariableManager
-from ansible.inventory import Inventory
-from ansible.playbook.play import Play
-from ansible.executor.task_queue_manager import TaskQueueManager
-from ansible.plugins.callback import CallbackBase
+import fish
 import prettytable
 
 import helpers
@@ -91,24 +84,24 @@ def print_result(answer, headers):
 
 
 # Information functions #
-def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=None, vm_id=None):
+def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=None):
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientId': customer_id, 'apiKey': api_key}
+    payload = {'clientId': customer_id, 'apiKey': api_key, }
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
     if raw:
         print message
-        return message
     else:
         print_info(answer, table_format)
-        return 0
+
+    return message
 
 
 # Action functions #
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
-              open_support_access, public_key_id, software_id, api_key=None, customer_id=None, raw=False):
+              open_support_access, public_key_id, software_id, api_key=None, customer_id=None, raw=False, id_only=False):
     url = '{0}vm/install/'.format(helpers.api_link)
     logger.debug('URL for create-vm: {0}'.format(url))
     if api_key in [None, ''] or customer_id in [None, '']:
@@ -138,12 +131,44 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
+    try:
+        vm_id = answer['result']
+        operation_id = answer['operationId']
+    except KeyError:
+        print 'Received invalid response, exiting...'
+        logger.exception('Can not get vm_id or operation_id from responses json.')
+        sys.exit(1)
+    except Exception:
+        print 'Unknown Error, exiting...'
+        logger.exception('Error occurred while parsing response json.')
+        sys.exit(1)
+
+    if type(vm_id) != int:
+        logger.error('Invalid vm_id.')
+        sys.exit(1)
+    elif type(operation_id) != int:
+        logger.error('Invalid operation_id.')
+        sys.exit(1)
+
     logger.debug('Response is received:\nCode: {0}\nMessage: {1}'.format(code, message))
 
-    if raw:
+    if id_only:
+        print vm_id
+    elif raw:
         print message
     else:
         print_result(answer, ['result', 'operationId'])
+
+    url = 'operation/{0}/'.format(operation_id)
+    info = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=url)
+    status = info['result']['status']
+
+    while status == 'DONE':
+        fish.animate()
+        info = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=url)
+        status = info['result']['status']
+
+    print 'Operation with ID {0} is finished. Virtual machine {1} is created.'.format(operation_id, name)
 
 
 def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):

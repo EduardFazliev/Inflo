@@ -45,7 +45,7 @@ def invoke_get_vm_info(args):
         args: Arguments, received from arpgparse object.
     """
     url = '{0}vm/{1}/'.format(api_link, args.vm_id)
-    inflo.get_info(vm_id=args.vm_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
+    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
                    table_format=['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddress',
                                  'state', 'timeAdded', (2, 'distribution', 'name')])
 
@@ -64,13 +64,13 @@ def invoke_os_list(args):
 
 def invoke_get_vm_snapshots(args):
     url = '{0}vm/{1}/snapshots/'.format(api_link, args.vm_id)
-    inflo.get_info(vm_id=args.vm_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
+    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
                    table_format=['id', 'name', 'description', 'bitness', 'parentSnapshotId', 'timeAdded'])
 
 
 def invoke_get_vm_backups(args):
     url = '{0}vm/{1}/backups/'.format(api_link, args.vm_id)
-    inflo.get_info(vm_id=args.vm_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
+    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
                    table_format=[['id', 'size', 'timeAdded']])
 
 
