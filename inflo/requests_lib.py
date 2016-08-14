@@ -6,7 +6,7 @@ from requests.auth import HTTPBasicAuth
 logger = logging.getLogger(__name__)
 
 
-def send_post_request(self, url, payload):
+def send_post_request(url, payload):
     """Sends post request with spec header.
     Args:
         url (str): API URL to send comment.
@@ -30,7 +30,7 @@ def send_post_request(self, url, payload):
     return result
 
 
-def send_put_request(self, url, payload):
+def send_put_request(url, payload):
     """Sends put request with spec header.
     Args:
         url (str): API URL to send comment.

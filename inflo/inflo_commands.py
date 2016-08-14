@@ -1,13 +1,14 @@
 import json
 import logging
+import sys
 
 import prettytable
-import sys
 
 import helpers
 import requests_lib
+from parser import api_link
 
-api_link = 'https://api.flops.ru/api/v1/'
+
 logger = logging.getLogger(__name__)
 inflo_delete_key = 'inflo_created_'
 
@@ -132,7 +133,10 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
     answer = json.loads(message)
     logger.debug('Response is received:\nCode: {0}\nMessage: {1}'.format(code, message))
 
-    print_result(answer, ['result', 'operationId'])
+    if raw:
+        print message
+    else:
+        print_result(answer, ['result', 'operationId'])
 
 
 def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
@@ -148,12 +152,12 @@ def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
     print_result(answer, ['operationId'])
 
 
-def add_pub_key(vm_id, tenant_id, key_ids, api_key=None, customer_id=None, raw=False):
+def add_pub_key(vm_id, tenant_id, key_ids=[], api_key=None, customer_id=None, raw=False):
     url = '{0}vm/[vmId]/pubkey_change/'.format(api_link, vm_id)
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
 
-    payload = {'clientId': customer_id, 'apiKey': api_key, 'tenantId': tenant_id}
+    payload = {'clientId': customer_id, 'apiKey': api_key, 'tenantId': tenant_id, 'keyIds': key_ids}
 
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
@@ -167,7 +171,7 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
         api_key, customer_id = helpers.get_conf()
 
     # Getting info in raw(json) format.
-    info_raw = get_info(vm_id, api_key=api_key, customer_id=customer_id, raw=True)
+    info_raw = get_info(vm_id=vm_id, api_key=api_key, customer_id=customer_id, raw=True)
     info = json.loads(info_raw)
     status = info['result']['name']
     if status != 'OK':
@@ -187,7 +191,10 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
-    print_result(answer, ['operationId'])
+    if raw:
+        print message
+    else:
+        print_result(answer, ['operationId'])
 ####################
 
 if __name__ == '__main__':   

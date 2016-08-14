@@ -10,7 +10,7 @@ api_link = 'https://api.flops.ru/api/v1/'
 
 
 def invoke_store_conf(args):
-    inflo.set_conf(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
+    inflo.set_conf(ext_api=args.api_key, ext_id=args.customer_id)
 
 
 def invoke_get_tenant_info(args):
@@ -70,24 +70,25 @@ def invoke_get_vm_snapshots(args):
 
 def invoke_get_vm_backups(args):
     url = '{0}vm/{1}/backups/'.format(api_link, args.vm_id)
-    inflo.get_info(vm_id=args.vm_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw,
+    inflo.get_info(vm_id=args.vm_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
                    table_format=[['id', 'size', 'timeAdded']])
 
 
 def invoke_get_pubkeys(args):
-    url = '{0}vm/{1}/backups/'.format(api_link, vm_id)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw = args.raw,
+    url = '{0}pubkeys/'.format(api_link, args.vm_id)
+    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw = args.raw,  url=url,
                    table_format=['id', 'name', 'type', 'publicKey', 'timeAdded'])
 
 
 def invoke_get_software(args):
     url = '{0}software/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, table_format=['id', 'name'])
+    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
+                   table_format=['id', 'name'])
 
 
 def invoke_get_tariffs(args):
     url = '{0}tariffs/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw,
+    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
                    table_format=['id', 'name', 'memory', 'disk', 'cpu', 'ipCount', 'onDemand', 'forWindows'])
 
 

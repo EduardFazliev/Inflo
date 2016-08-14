@@ -10,7 +10,7 @@ filename = 'inflo.secret'
 
 
 def str_check(str_assume, str_mean):
-    """Functions performes check if variable is string or can be converted to string.
+    """Function performes check if variable is string or can be converted to string.
 
     Args:
         str_assume: Variable, that assumed to be a string.
@@ -32,7 +32,12 @@ def str_check(str_assume, str_mean):
         return str_assume
 
 
-def set_conf(ext_api, ext_id):
+def set_conf(ext_api=None, ext_id=None):
+    if ext_api is None and ext_id is None:
+        logger.debug('API and ID is none, nothing to do...')
+        print 'No API or ID specified, exiting...'
+        sys.exit(0)
+
     api = str_check(ext_api, 'API key')
     cust_id = str_check(ext_id, 'Customer ID')
 
@@ -64,7 +69,7 @@ def get_conf():
             api = js_dict['api']
             cust_id = js_dict['id']
         except Exception as e:
-            logger.debug('Error occured while decrypting API and ID: {0}'.format(e))
+            logger.debug('Error occurred while decrypting API and ID: {0}'.format(e))
             print 'Wrong password, sorry dude... bye!'
             sys.exit(0)
         else:
