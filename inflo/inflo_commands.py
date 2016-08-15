@@ -1,6 +1,7 @@
 import json
 import logging
 import sys
+import time
 
 import fish
 import prettytable
@@ -84,6 +85,8 @@ def print_result(answer, headers):
 
 
 # Information functions #
+
+
 def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=None):
     if api_key in [None, ''] or customer_id in [None, '']:
         api_key, customer_id = helpers.get_conf()
@@ -97,6 +100,43 @@ def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=N
         print_info(answer, table_format)
 
     return message
+
+
+def wait_for_async_answer(api_key=None, customer_id=None, raw=True, url=None, operation_id=None):
+    logger.debug('URL for operation request is {0}.'.format(url))
+
+    pb = fish.ProgressFish(total=100)
+
+    while True:
+        response = get_info(api_key=api_key, customer_id=customer_id, raw=raw, url=url)
+
+        # Get result and load it in 'info' dictionary.
+        try:
+            info_common = json.loads(response)
+            info = info_common['result']
+        except KeyError:
+            logger.exception('No "result" key in response json.')
+
+        # If error occurred - return error code and error message.
+        try:
+            if info['errorMessage'] is not None:
+                return -1, info['errorMessage']
+        except KeyError:
+            logger.exception('No "errorMessage" key in response json.')
+
+        # If percentage is equal 100 and status is "DONE" - return
+        # success code and 'info' dictionary.
+        try:
+            if info['percentage'] in ('100', 100) and info['status'] == 'DONE':
+                logger.debug('Operation with ID {0} is finished.'.format(operation_id))
+                return 0, info
+        except KeyError:
+            logger.exception('No "percentage" or "status" key in response json.')
+
+        # Show current progress with "fish" progress bar.
+        print type(info['percentage'])
+        pb.animate(amount=info['percentage'])
+        time.sleep(1)
 
 
 # Action functions #
@@ -160,15 +200,18 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
         print_result(answer, ['result', 'operationId'])
 
     url = 'operation/{0}/'.format(operation_id)
-    info = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=url)
-    status = info['result']['status']
+    code, message = wait_for_async_answer(api_key=api_key, customer_id=customer_id, raw=True, operation_id=operation_id,
+                                          url=url)
 
-    while status == 'DONE':
-        fish.animate()
-        info = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=url)
-        status = info['result']['status']
-
-    print 'Operation with ID {0} is finished. Virtual machine {1} is created.'.format(operation_id, name)
+    if code == 0:
+        logger.info('Operation with ID {0} is finished. Virtual machine {1} is created.'.format(operation_id, name))
+        return 0
+    else:
+        logger.info(
+                'Operation with ID {0} is NOT finished. Virtual machine {1} is NOT created. '
+                'Reason: {2}'.format(operation_id, name, message)
+        )
+        return 1
 
 
 def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
@@ -206,7 +249,8 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
         api_key, customer_id = helpers.get_conf()
 
     # Getting info in raw(json) format.
-    info_raw = get_info(vm_id=vm_id, api_key=api_key, customer_id=customer_id, raw=True)
+    info_url = '{0}vm/{1}/'.format(helpers.api_link, vm_id)
+    info_raw = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=info_url)
     info = json.loads(info_raw)
     status = info['result']['name']
     if status != 'OK':
@@ -230,14 +274,6 @@ def delete_vm(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
         print message
     else:
         print_result(answer, ['operationId'])
-
-
-def get_ip(api_key=None, customer_id=None, vm_id=None):
-    url = '{0}vm/{1}/'.format(helpers.api_link, vm_id)
-    info_json = get_info(api_key=api_key, customer_id=customer_id, vm_id=vm_id, raw=True)
-    info = json.loads(info_json)
-    server_ip = info['result']['ipAddresses'][0]
-    return server_ip
 
 
 ####################
