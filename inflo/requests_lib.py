@@ -5,6 +5,7 @@ from requests.auth import HTTPBasicAuth
 
 logger = logging.getLogger(__name__)
 
+
 def send_get_request(url, payload):
     """Sends get request with spec header.
     Args:
