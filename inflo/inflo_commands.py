@@ -103,6 +103,7 @@ def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=N
 
 
 def wait_for_async_answer(api_key=None, customer_id=None, raw=True, url=None, operation_id=None, retry=3, timeout=180):
+    url = '{0}operation/{1}/'.format(helpers.api_link, operation_id)
     logger.debug('URL for operation request is {0}.'.format(url))
 
     # Initialize progress bar, retry_counter, timeout_counter.
@@ -246,7 +247,6 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
     else:
         print_result(answer, ['result', 'operationId'])
 
-    url = 'operation/{0}/'.format(operation_id)
     code, message = wait_for_async_answer(api_key=api_key, customer_id=customer_id, raw=True, operation_id=operation_id,
                                           url=url)
 
@@ -297,7 +297,6 @@ def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
     else:
         print_result(answer, ['operationId'])
 
-    url = 'operation/{0}/'.format(operation_id)
     code, message = wait_for_async_answer(api_key=api_key, customer_id=customer_id, raw=True, operation_id=operation_id,
                                           url=url)
 
