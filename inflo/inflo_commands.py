@@ -255,7 +255,7 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
     if code == 0:
         logger.info('Operation with ID {0} is finished. Virtual machine {1} is created.'.format(operation_id, name))
         # Get server-list for determine vm ID.
-        code, message = get_created_vm_info(name)
+        code, message = get_created_vm_info(name, api_key, customer_id)
 
         if code == 0:
             with open('created_vm', 'w') as f:
