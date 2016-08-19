@@ -28,7 +28,7 @@ def get_created_vm_info(name, api_key, customer_id):
     for server in server_list:
         if server['name'] == name:
             return 0, {
-                'ip': server['ipAdresses'][0],
+                'ip': server['ipAddresses'][0],
                 'id': server['id']
             }
 
