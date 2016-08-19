@@ -259,9 +259,9 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
         if code == 0:
             with open('created_vm', 'w') as f:
-                f.write('vm_name {0}'.format(name))
-                f.write('ip {0}'.format(message['ip']))
-                f.write('id {0}'.format(message['id']))
+                f.write('vm_name {0}\n'.format(name))
+                f.write('ip {0}\n'.format(message['ip']))
+                f.write('id {0}\n'.format(message['id']))
             return 0
         else:
             logger.info(message)
