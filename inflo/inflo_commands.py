@@ -189,7 +189,7 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
     payload = {
         'clientId': customer_id,
         'apiKey': api_key,
-        'name': name,
+        'name': inflo_delete_key + name,
         'tenantId': tenant_id,
         'distributionId': distr_id,
         'tariffId': tariff_id,
