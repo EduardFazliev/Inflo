@@ -93,9 +93,9 @@ def invoke_get_tariffs(args):
 
 
 def invoke_create_vm(args):
-    if args.disk/args.memory < 64:
+    if int(args.disk)/int(args.memory) < 64:
         logger.debug('HDD/MEMORY is lower than 64. Exiting...')
-        print 'HDD/MEMORY must be equal or great than 64. Exiting...'
+        logger.info('HDD/MEMORY must be equal or great than 64. Exiting...')
         sys.exit(0)
     else:
         logger.debug('Args list for create virtual server:\n{0}'.format(args))

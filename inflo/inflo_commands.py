@@ -14,6 +14,27 @@ logger = logging.getLogger(__name__)
 inflo_delete_key = 'inflo_created_'
 
 
+def get_created_vm_info(name, api_key, customer_id):
+    # Get servers list
+    url = '{0}vm/'.format(helpers.api_link)
+    response = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=url)
+    try:
+        server_list = response['result']
+    except KeyError:
+        err_message = 'No key "result" in response json.'
+        logger.exception(err_message)
+        return 2, err_message
+
+    for server in server_list:
+        if server['name'] == name:
+            return 0, {
+                'ip': server['ipAdresses'][0],
+                'id': server['id']
+            }
+
+    return 1, 'No VM with name {0} was found.'.format(name)
+
+
 # Print functions #
 def print_info(answer, headers):
     try:
@@ -99,7 +120,7 @@ def get_info(api_key=None, customer_id=None, raw=False, url=None, table_format=N
     else:
         print_info(answer, table_format)
 
-    return message
+    return answer
 
 
 def wait_for_async_answer(api_key=None, customer_id=None, raw=True, url=None, operation_id=None, retry=3, timeout=180):
@@ -252,9 +273,18 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
     if code == 0:
         logger.info('Operation with ID {0} is finished. Virtual machine {1} is created.'.format(operation_id, name))
-        with open('created_vm', 'w') as f:
-            f.write('vm_name {0}'.format(name))
-        return 0
+        # Get server-list for determine vm ID.
+        code, message = get_created_vm_info(name)
+
+        if code == 0:
+            with open('created_vm', 'w') as f:
+                f.write('vm_name {0}'.format(name))
+                f.write('ip {0}'.format(message['ip']))
+                f.write('id {0}'.format(message['id']))
+            return 0
+        else:
+            logger.info(message)
+            return -1, message
     else:
         logger.info(
                 'Operation with ID {0} is NOT finished. Virtual machine {1} is NOT created. '
