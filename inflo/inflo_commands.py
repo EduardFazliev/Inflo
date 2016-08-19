@@ -176,7 +176,7 @@ def wait_for_async_answer(api_key=None, customer_id=None, raw=True, url=None, op
 
 # Action functions #
 def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
-              open_support_access, public_key_id, software_id, api_key=None, customer_id=None, raw=False, id_only=False):
+              open_support_access, public_key_id, software_id, api_key=None, customer_id=None, raw=False):
     url = '{0}vm/install/'.format(helpers.api_link)
     logger.debug('URL for create-vm: {0}'.format(url))
 
@@ -239,9 +239,7 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
     logger.debug('Response is received:\nCode: {0}\nMessage: {1}'.format(code, message))
 
-    if id_only:
-        print vm_id
-    elif raw:
+    if raw:
         print message
     else:
         print_result(answer, ['result', 'operationId'])
@@ -252,6 +250,8 @@ def create_vm(name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count,
 
     if code == 0:
         logger.info('Operation with ID {0} is finished. Virtual machine {1} is created.'.format(operation_id, name))
+        with open('created_vm', 'w') as f:
+            f.write('vm_name {0}'.format(name))
         return 0
     else:
         logger.info(
@@ -271,10 +271,43 @@ def start_server(vm_id, tenant_id, api_key=None, customer_id=None, raw=False):
     code, message = requests_lib.send_get_request(url, payload)
     answer = json.loads(message)
 
+    try:
+        status = answer['status']
+    except KeyError:
+        err_message = 'No key "status" in response json.'
+        logger.exception(err_message)
+        return 2, err_message
+
+    if status != 'OK':
+        logger.info('Returned status is not "OK". Operation failed.')
+        logger.debug('Response code: {0}, response message: {1}'.format(code, message))
+        return 1, message
+    else:
+        try:
+            operation_id = answer['operationId']
+        except KeyError:
+            err_message = 'No key "status" in response json.'
+            logger.exception(err_message)
+            return 2, err_message
+
     if raw:
         print message
     else:
         print_result(answer, ['operationId'])
+
+    url = 'operation/{0}/'.format(operation_id)
+    code, message = wait_for_async_answer(api_key=api_key, customer_id=customer_id, raw=True, operation_id=operation_id,
+                                          url=url)
+
+    if code == 0:
+        logger.info('Operation with ID {0} is finished. Virtual machine started.'.format(operation_id))
+        return 0, 'Virtual machine is successfully started.'
+    else:
+        logger.info(
+                'Operation with ID {0} is NOT finished. Virtual machine is NOT started. '
+                'Reason: {1}'.format(operation_id, message)
+        )
+        return 1, 'Virtual machine is not started.'
 
 
 def add_pub_key(vm_id, tenant_id, key_ids=[], api_key=None, customer_id=None, raw=False):
