@@ -136,34 +136,15 @@ def wait_for_async_answer(api_key=None, customer_id=None, raw=True, url=None, op
     logger.debug('Timeout counter is initialized. Total timeout set to: {0}'.format(timeout))
 
     while True:
-        response = get_info(api_key=api_key, customer_id=customer_id, raw=raw, url=url)
+        info_common = get_info(api_key=api_key, customer_id=customer_id, raw=raw, url=url)
 
-        # Try load json into dictionary.
-        logger.debug('Trying to load response json in dictionary...')
+        logger.debug('Loaded successfully.\nTrying to get value of "result" key.')
         try:
-            info_common = json.loads(response)
-        except ValueError:
-            err_message = 'Can not decode json.'
+            info = info_common['result']
+        except KeyError:
+            err_message = 'No "result" key in response json.'
             logger.exception(err_message)
-
-            # Check retry counts.
-            if retry_counter > retry:
-                # Return error if retry_counter greater than retry.
-                logger.debug('Max retries. Returning error.')
-                return 2, err_message
-            else:
-                # Else increase retry_counter
-                retry_counter += 1
-                logger.debug('Retry_counter increased. Current value: {0}'.format(retry_counter))
-                continue
-        else:
-            logger.debug('Loaded successfully.\nTrying to get value of "result" key.')
-            try:
-                info = info_common['result']
-            except KeyError:
-                err_message = 'No "result" key in response json.'
-                logger.exception(err_message)
-                return 1, err_message
+            return 1, err_message
 
         # If error occurred - return error code and error message.
         try:
@@ -361,8 +342,7 @@ def delete_vm(vm_id=None, tenant_id=None, api_key=None, customer_id=None, raw=Fa
 
     # Getting info in raw(json) format.
     info_url = '{0}vm/{1}/'.format(helpers.api_link, vm_id)
-    info_raw = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=info_url)
-    info = json.loads(info_raw)
+    info = get_info(api_key=api_key, customer_id=customer_id, raw=True, url=info_url)
 
     try:
         status = info['status']
