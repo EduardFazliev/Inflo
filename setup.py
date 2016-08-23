@@ -13,9 +13,7 @@ setup(
         test_suite='nose.collector',
         install_requires=[
             'requests',
-            'simple-crypt',
             'prettytable',
-            'ansible',
             'fish'
         ],
         tests_require=[
