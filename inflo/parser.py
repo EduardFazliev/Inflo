@@ -3,14 +3,11 @@ import logging
 import sys
 
 import inflo
-from helpers import api_link
+from flops import FlopsApi
 
 
 logger = logging.getLogger(__name__)
-
-
-def invoke_store_conf(args):
-    inflo.set_conf(ext_api=args.api_key, ext_id=args.customer_id)
+api_link = FlopsApi.api_link
 
 
 def invoke_get_tenant_info(args):
@@ -21,8 +18,8 @@ def invoke_get_tenant_info(args):
         args: Arguments, received from arpgparse object.
     """
     url = '{0}tenant/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=['id', 'description'])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_server_list(args):
@@ -33,8 +30,8 @@ def invoke_server_list(args):
         args: Arguments, received from arpgparse object.
     """
     url = '{0}vm/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=['id', 'name', 'memory', 'disk', 'cpu', 'ipAddresses', ('2', 'distribution', 'name')])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_get_vm_info(args):
@@ -45,9 +42,8 @@ def invoke_get_vm_info(args):
         args: Arguments, received from arpgparse object.
     """
     url = '{0}vm/{1}/'.format(api_link, args.vm_id)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=['id', 'name', 'cpu', 'memory', 'disk', 'bandwidth', 'ipAddresses', 'privateIpAddress',
-                                 'state', 'timeAdded', (2, 'distribution', 'name')])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_os_list(args):
@@ -58,60 +54,55 @@ def invoke_os_list(args):
         args: Arguments, received from arpgparse object.
     """
     url = '{0}distribution/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=['id', 'name', 'description', 'bitness'])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_get_vm_snapshots(args):
     url = '{0}vm/{1}/snapshots/'.format(api_link, args.vm_id)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=['id', 'name', 'description', 'bitness', 'parentSnapshotId', 'timeAdded'])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_get_vm_backups(args):
     url = '{0}vm/{1}/backups/'.format(api_link, args.vm_id)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=[['id', 'size', 'timeAdded']])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_get_pubkeys(args):
     url = '{0}pubkeys/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw = args.raw,  url=url,
-                   table_format=['id', 'name', 'type', 'publicKey', 'timeAdded'])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_get_software(args):
     url = '{0}software/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=['id', 'name'])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_get_tariffs(args):
     url = '{0}tariffs/'.format(api_link)
-    inflo.get_info(api_key=args.api_key, customer_id=args.customer_id, raw=args.raw, url=url,
-                   table_format=['id', 'name', 'memory', 'disk', 'cpu', 'ipCount', 'onDemand', 'forWindows'])
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.info(url)
 
 
 def invoke_create_vm(args):
-    if int(args.disk)/int(args.memory) < 64:
-        logger.debug('HDD/MEMORY is lower than 64. Exiting...')
-        logger.info('HDD/MEMORY must be equal or great than 64. Exiting...')
-        sys.exit(0)
-    else:
-        logger.debug('Args list for create virtual server:\n{0}'.format(args))
-        inflo.create_vm(args.name, args.tenant_id, args.distr_id, args.tariff_id, args.memory, args.disk, args.cpu,
-                        args.ip_count, args.password, args.send_password, args.open_support_access, args.public_key_id,
-                        args.software_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
+    logger.debug('Args list for create virtual server:\n{0}'.format(args))
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.create_vm(args.name, args.tenant_id, args.distr_id, args.tariff_id, args.memory, args.disk, args.cpu,
+                    args.ip_count, args.password, args.send_password, args.open_support_access, args.public_key_id,
+                    args.software_id)
 
 
 def invoke_delete_vm(args):
-    inflo.delete_vm(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
+    flops = FlopsApi(args.api_key, args.customer_id)
+    flops.delete_vm(args.vm_id, args.tenant_id)
 
 
-def invoke_start_vm(args):
-    inflo.start_server(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
-
-
+#def invoke_start_vm(args):
+#    inflo.start_server(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
 def set_logger(verbosity):
     if verbosity:
         logging.basicConfig(level=logging.DEBUG)
@@ -127,10 +118,6 @@ def invoke_parser(script_args):
     parser.add_argument('-i', '--customer-id', type=str, help='Client ID.')
 
     subparsers = parser.add_subparsers()
-
-    configure = subparsers.add_parser('configure', help='Set API key and client id. '
-                                                        'Use this if you want to temporary store credentials in file.')
-    configure.set_defaults(func=invoke_store_conf)
 
     tenant_info = subparsers.add_parser('tenant-info', help='Get tenant info.')
     tenant_info.set_defaults(func=invoke_get_tenant_info)
@@ -189,10 +176,10 @@ def invoke_parser(script_args):
     delete_vm.add_argument('--tenant-id', type=int, help='Tenant ID.')
     delete_vm.set_defaults(func=invoke_delete_vm)
 
-    start_vm = subparsers.add_parser('start-vm', help='Delete server.')
-    start_vm.add_argument('--vm-id', type=int, help='Virtual server ID to delete.')
-    start_vm.add_argument('--tenant-id', type=int, help='Tenant ID.')
-    start_vm.set_defaults(func=invoke_start_vm)
+#    start_vm = subparsers.add_parser('start-vm', help='Delete server.')
+#    start_vm.add_argument('--vm-id', type=int, help='Virtual server ID to delete.')
+#    start_vm.add_argument('--tenant-id', type=int, help='Tenant ID.')
+#    start_vm.set_defaults(func=invoke_start_vm)
 
     args = parser.parse_args(script_args)
     set_logger(args.verbose)
@@ -200,4 +187,4 @@ def invoke_parser(script_args):
 
 
 if __name__ == '__main__':
-    invoke_parser(['-v', 'vm-info', '--vm-id', '106000'])
+    pass
