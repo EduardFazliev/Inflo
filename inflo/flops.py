@@ -150,7 +150,7 @@ class FlopsApi(object):
         response = self.deserialize_json(message)
         # Pretty print dict
 
-        print response
+        pprint.pprint(response)
         return response
 
     def create_vm(self, name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
@@ -188,7 +188,7 @@ class FlopsApi(object):
 
         logger.debug('Response is received:{0}'.format(response))
 
-        print response
+        pprint.pprint(response)
 
         code, message = self.wait_for_async_answer(operation_id)
 
