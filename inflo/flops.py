@@ -3,6 +3,7 @@ import logging
 import pprint
 import sys
 import time
+from encodings.utf_8 import encode
 
 import fish
 import requests
@@ -148,7 +149,8 @@ class FlopsApi(object):
         # Using staticmethod to ensure, that response is a correct json.
         response = self.deserialize_json(message)
         # Pretty print dict
-        pprint.pprint(response, width=1)
+
+        print response
         return response
 
     def create_vm(self, name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
@@ -186,7 +188,7 @@ class FlopsApi(object):
 
         logger.debug('Response is received:{0}'.format(response))
 
-        pprint.pprint(response, width=1)
+        print response
 
         code, message = self.wait_for_async_answer(operation_id)
 
@@ -237,7 +239,7 @@ class FlopsApi(object):
         code, message = self.send_get_request(url, payload)
         answer = self.deserialize_json(message)
 
-        pprint.pprint(answer, width=1)
+        print answer
 
         logger.info('VM is successfully deleted.')
         return 0
