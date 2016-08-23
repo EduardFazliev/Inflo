@@ -2,7 +2,6 @@ import getpass
 import json
 import logging
 
-import simplecrypt
 import sys
 
 logger = logging.getLogger(__name__)

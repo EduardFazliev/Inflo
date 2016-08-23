@@ -1,5 +1,3 @@
-from inflo.helpers import set_conf, get_conf
-from inflo.inflo_commands import create_vm, delete_vm, get_info, start_server, wait_for_async_answer
 from inflo.flops import FlopsApi
 from inflo.parser import invoke_parser
 
