@@ -13,13 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 class FlopsJsonException(Exception):
-    def __str__(self, message):
-        print message
+    def __init__(self):
+        self.message = 'Invalid JSON received.'
 
 
-class FlopsJsonNoSuchKeyException(Exception):
-    def __str__(self, key):
-        print 'No key {0} in received json was found.'.format(key)
+class FlopsJsonNoSuchKeyException(FlopsJsonException):
+    def __init__(self, key):
+        super(FlopsJsonException, self).__init__()
+        self.message += 'No key {0} in received json was found.'.format(key)
 
 
 class FlopsApi(object):
@@ -58,7 +59,7 @@ class FlopsApi(object):
             dsr_dict = json.loads(json_string)
         except Exception as e:
             logger.debug(e)
-            raise FlopsJsonException('Can not deserialize json.')
+            raise FlopsJsonException()
         else:
             return dsr_dict
 
@@ -69,6 +70,14 @@ class FlopsApi(object):
         except KeyError as e:
             logger.debug('Error while trying get key value: {0}'.format(e))
             raise FlopsJsonNoSuchKeyException(key)
+        except TypeError as e:
+            logger.debug('Unexpected exception: {0}'.format(e))
+            raise FlopsJsonException()
+        except KeyboardInterrupt:
+            logger.info('Interrupted by user.')
+            logger.debug('Interrupted by user while executing "get_dict_key" with parameters:\n'
+                         'input dict: {0}\n'
+                         'key: {1}'.format(input_dict, key))
         else:
             return result
 
@@ -275,10 +284,14 @@ class FlopsApi(object):
                 logger.info(
                     'Operation with ID {0} is finished. Virtual machine with ID {1} is stopped.'.format(operation_id,
                                                                                                         vm_id))
+                return 0
             else:
                 logger.info(
                         'Operation with ID {0} is NOT finished. Virtual machine {1} may be NOT stopped. '
                         'Reason: {2}'.format(operation_id, vm_id, message)
                 )
-
-            return 0
+                return 1
+        else:
+            logger.info('No inflo key is in virtual server name, will not stop VM.')
+            logger.debug('key_exist value is {0}, not stopping VM.'.format(key_exist))
+            return 1

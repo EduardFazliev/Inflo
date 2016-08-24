@@ -18,6 +18,7 @@ setup(
         ],
         tests_require=[
             'nose',
-            'mock'
+            'mock',
+            'coverage'
         ]
 )
