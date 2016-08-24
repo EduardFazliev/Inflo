@@ -25,6 +25,7 @@ class FlopsJsonNoSuchKeyException(Exception):
 class FlopsApi(object):
     inflo_key = 'inflo_created_'
     api_link = 'https://api.flops.ru/api/v1/'
+    created_vm_info_file = 'created_vm'
 
     def __init__(self, api_key, customer_id):
         self.api_key = api_key
@@ -70,6 +71,23 @@ class FlopsApi(object):
             raise FlopsJsonNoSuchKeyException(key)
         else:
             return result
+
+    def check_inflo_key(self, vm_id):
+        url = '{0}vm/{1}/'.format(FlopsApi.api_link, vm_id)
+
+        vm_info = self.info(url)
+        status = self.get_dict_key(vm_info, 'status')
+
+        if status != 'OK':
+            logger.info('Can not get virtual server name to check.')
+            return False
+        else:
+            result = self.get_dict_key(vm_info, 'result')
+            vm_name = self.get_dict_key(result, 'name')
+            if FlopsApi.inflo_key in vm_name:
+                return True
+            else:
+                return False
 
     def vm_info_by_name(self, name):
         # Get servers list
@@ -197,8 +215,9 @@ class FlopsApi(object):
             # Get server-list for determine vm ID.
             code, message = self.vm_info_by_name(name)
 
+            # If virtual server is appeared in server list, store it's ip, id and name in file.
             if code == 0:
-                with open('created_vm', 'w') as f:
+                with open(FlopsApi.created_vm_info_file, 'w') as f:
                     f.write('vm_name {0}\n'.format(name))
                     f.write('ip {0}\n'.format(message['ip']))
                     f.write('id {0}\n'.format(message['id']))
@@ -207,6 +226,7 @@ class FlopsApi(object):
                 logger.info('Virtual machine is created, but no info retrieved. Check Flops web-console for details.')
                 return -1
         else:
+            # If virtual server with specific name not appeared in server list, then something went wrong.
             logger.info(
                     'Operation with ID {0} is NOT finished. Virtual machine {1} is NOT created. '
                     'Reason: {2}'.format(operation_id, name, message)
@@ -216,30 +236,49 @@ class FlopsApi(object):
     def delete_vm(self, vm_id, tenant_id):
         url = '{0}vm/{1}/delete'.format(FlopsApi.api_link, vm_id)
         # Getting info in raw(json) format.
-        info_url = '{0}vm/{1}/'.format(FlopsApi.api_link, vm_id)
 
-        vm_info = self.info(info_url)
-        status = self.get_dict_key(vm_info, 'status')
+        key_exist = self.check_inflo_key(vm_id)
 
-        if status != 'OK':
-            logger.info('Can not get virtual server name to check. Not deleting VM.')
-            return 1
+        if key_exist:
+            logger.debug('Inflo key is in virtual server name, deleting...')
+            payload = {'clientId': self.customer_id, 'apiKey': self.api_key, 'tenantId': tenant_id}
+            logger.debug('Payload for deleting server formed: {0}.'.format(payload))
+
+            code, message = self.send_get_request(url, payload)
+            answer = self.deserialize_json(message)
+
+            pprint.pprint(answer)
+
+            logger.info('VM is successfully deleted.')
         else:
-            result = self.get_dict_key(vm_info, 'result')
-            vm_name = self.get_dict_key(result, 'name')
-
-        if FlopsApi.inflo_key in vm_name:
-            logger.info('Inflo delete key is found. Deleting vm...')
-        else:
-            logger.info('Inflo delete key is not found. Not deleting vm...')
-            return 0
-
-        payload = {'clientId': self.customer_id, 'apiKey': self.api_key, 'tenantId': tenant_id}
-
-        code, message = self.send_get_request(url, payload)
-        answer = self.deserialize_json(message)
-
-        print answer
-
-        logger.info('VM is successfully deleted.')
+            logger.inflo('VM is NOT deleted.')
         return 0
+
+    def shutdown(self, vm_id, tenant_id):
+        url = '{0}vm/{1}/poweroff'.format(FlopsApi.api_link, vm_id)
+
+        key_exist = self.check_inflo_key(vm_id)
+
+        if key_exist:
+            logger.debug('Inflo key is in virtual server name, shutdown in progress...')
+            payload = {'clientId': self.customer_id, 'apiKey': self.api_key, 'tenantId': tenant_id}
+            logger.debug('Payload for stopping server formed: {0}'.format(payload))
+
+            code, message = self.send_get_request(url, payload)
+            answer = self.deserialize_json(message)
+            pprint.pprint(answer)
+            operation_id = self.get_dict_key(answer, 'operationId')
+
+            code, message = self.wait_for_async_answer(operation_id)
+
+            if code == 0:
+                logger.info(
+                    'Operation with ID {0} is finished. Virtual machine with ID {1} is stopped.'.format(operation_id,
+                                                                                                        vm_id))
+            else:
+                logger.info(
+                        'Operation with ID {0} is NOT finished. Virtual machine {1} may be NOT stopped. '
+                        'Reason: {2}'.format(operation_id, vm_id, message)
+                )
+
+            return 0

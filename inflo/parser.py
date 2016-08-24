@@ -1,11 +1,9 @@
 import argparse
 import logging
-import sys
 
-import inflo
 from flops import FlopsApi
 
-
+logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s')
 logger = logging.getLogger(__name__)
 api_link = FlopsApi.api_link
 
@@ -101,6 +99,11 @@ def invoke_delete_vm(args):
     flops.delete_vm(args.vm_id, args.tenant_id)
 
 
+def invoke_shutdown(args):
+    flops = FlopsApi(args.api_key, args.customer_id)
+
+
+
 #def invoke_start_vm(args):
 #    inflo.start_server(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
 def set_logger(verbosity):
@@ -146,8 +149,8 @@ def invoke_parser(script_args):
     software_list = subparsers.add_parser('software-list', help='Get available software list.')
     software_list.set_defaults(func=invoke_get_software)
 
-    tariff_list = subparsers.add_parser('tariff-list', help='Get available tariff list.')
-    tariff_list.set_defaults(func=invoke_get_tariffs)
+    tariff = subparsers.add_parser('tariff', help='Get available tariff list.')
+    tariff.set_defaults(func=invoke_get_tariffs)
 
     create_vm = subparsers.add_parser('create-vm', help='Create virtual server.')
     create_vm.add_argument('--name', type=str, help='Name of virtual server.', default='inflo_created_test_vm')
@@ -175,6 +178,11 @@ def invoke_parser(script_args):
     delete_vm.add_argument('--vm-id', type=int, help='Virtual server ID to delete.')
     delete_vm.add_argument('--tenant-id', type=int, help='Tenant ID.')
     delete_vm.set_defaults(func=invoke_delete_vm)
+
+    shutdown = subparsers.add_parser('shutdown', help='Hard shutdown server.')
+    shutdown.add_argument('--vm-id', type=int, help='Virtual server ID.')
+    shutdown.add_argument('--tenant-id', type=int, help='Tenant ID.')
+    shutdown.set_defaults(func=invoke_shutdown)
 
 #    start_vm = subparsers.add_parser('start-vm', help='Delete server.')
 #    start_vm.add_argument('--vm-id', type=int, help='Virtual server ID to delete.')
