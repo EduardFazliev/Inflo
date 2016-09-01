@@ -101,7 +101,7 @@ def invoke_delete_vm(args):
 
 def invoke_shutdown(args):
     flops = FlopsApi(args.api_key, args.customer_id)
-
+    flops.shutdown(args.vm_id, args.tenant_id)
 
 
 #def invoke_start_vm(args):
