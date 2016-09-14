@@ -152,9 +152,16 @@ def invoke_shutdown(args):
     flops.shutdown(args.vm_id, args.tenant_id)
 
 
-#def invoke_start_vm(args):
-#    inflo.start_server(args.vm_id, args.tenant_id, api_key=args.api_key, customer_id=args.customer_id, raw=args.raw)
 def set_logger(verbosity):
+    """
+    Set logger verbosity.
+
+    Args:
+        verbosity(bool): True if verbosity is debug, False otherwise.
+
+    Returns:
+
+    """
     if verbosity:
         logging.basicConfig(level=logging.DEBUG)
     else:
