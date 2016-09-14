@@ -13,22 +13,39 @@ logger = logging.getLogger(__name__)
 
 
 class FlopsJsonException(Exception):
+    """
+    Custom exception class for Flops json parsing.
+    """
     def __init__(self):
         self.message = 'Invalid JSON received.'
 
 
 class FlopsJsonNoSuchKeyException(FlopsJsonException):
+    """
+    Custom exception class for no such key in json.
+
+    Args:
+        key: Json key, that could not be found in received json.
+    """
     def __init__(self, key):
         super(FlopsJsonException, self).__init__()
         self.message += 'No key {0} in received json was found.'.format(key)
 
 
 class FlopsApi(object):
+    """
+    This class is Flops API python realization.
+    """
     inflo_key = 'inflo_created_'
     api_link = 'https://api.flops.ru/api/v1/'
     created_vm_info_file = 'created_vm'
 
     def __init__(self, api_key, customer_id):
+        """
+        Args:
+            api_key: API key for Flops account.
+            customer_id: ID of Flops customer.
+        """
         self.api_key = api_key
         self.customer_id = customer_id
 
@@ -40,7 +57,6 @@ class FlopsApi(object):
             payload (dict): json to send.
         Returns:
             result.content (dict): Response content in json format.
-            result.status_code (str): Response code.
         """
         logger.debug('GET request: url: {0}, payload: {1}'.format(url, payload))
         try:
@@ -55,6 +71,15 @@ class FlopsApi(object):
 
     @staticmethod
     def deserialize_json(json_string):
+        """
+        Loads json in a dict, throws FlopsJsonException if failed.
+
+        Args:
+            json_string: Json string to load in dict.
+
+        Returns:
+            dsr_dict(dict): Dictionary loaded from json.
+        """
         try:
             dsr_dict = json.loads(json_string)
         except Exception as e:
@@ -65,6 +90,16 @@ class FlopsApi(object):
 
     @staticmethod
     def get_dict_key(input_dict, key):
+        """
+        Get value of specific key, throws FlopsJsonException if failed.
+
+        Args:
+            input_dict(dict): Original dictionary.
+            key: Required dictionary key.
+
+        Returns:
+            result: Value of key "key" in dictionary "input_dict".
+        """
         try:
             result = input_dict[key]
         except KeyError as e:
@@ -82,6 +117,16 @@ class FlopsApi(object):
             return result
 
     def check_inflo_key(self, vm_id):
+        """
+        Function checks if special key 'inflo_key' is in VM name.
+
+        Args:
+            vm_id: Virtual machine ID.
+
+        Returns:
+            True if 'inflo_key' is in VM name, False otherwise.
+
+        """
         url = '{0}vm/{1}/'.format(FlopsApi.api_link, vm_id)
 
         vm_info = self.info(url)
@@ -99,6 +144,16 @@ class FlopsApi(object):
                 return False
 
     def vm_info_by_name(self, name):
+        """
+        Get virtual machine info by name.
+
+        Args:
+            name(str): Name of virtual machine.
+
+        Returns:
+            Tuple (0, dict) if VM with name 'name' found, 1 otherwise.
+
+        """
         # Get servers list
         url = '{0}vm/'.format(FlopsApi.api_link)
         response = self.info(url)
@@ -120,6 +175,19 @@ class FlopsApi(object):
         return 1
 
     def wait_for_async_answer(self, operation_id, timeout=180):
+        """
+        Function waits for answer when async operation is in progress and prints current progress.
+
+        Args:
+            operation_id: ID of executing async operation.
+            timeout: Timeout for operation.
+
+        Returns:
+            Tuple (1, err) if errorMessage is in received json,
+            tuple (0, result) if 'status' files in received json is 'DONE' and
+            tuple (2, timeout_str) if timeout is reached.
+
+        """
         # Generating API URL to get information about ansync operation status.
         url = '{0}operation/{1}/'.format(FlopsApi.api_link, operation_id)
         logger.debug('URL for operation request is {0}.'.format(url))
@@ -167,6 +235,15 @@ class FlopsApi(object):
             time.sleep(5)
 
     def info(self, url):
+        """
+        Function is executing API call with specific url 'url' and print and returns response.
+
+        Args:
+            url: URL for API call.
+
+        Returns:
+            response(dict): Dictionary loaded from received json.
+        """
         # For info we need only send api key and id in payload.
         payload = {
             'clientId': self.customer_id,
@@ -182,6 +259,28 @@ class FlopsApi(object):
 
     def create_vm(self, name, tenant_id, distr_id, tariff_id, memory, disk, cpu, ip_count, password, send_password,
                   open_support_access, public_key_id, software_id):
+        """
+        Function create virtual machine with received parameters.
+        Args:
+            name: VM name.
+            tenant_id: Tenant ID.
+            distr_id: ID of required OS distro.
+            tariff_id: ID of tariff.
+            memory: Amount of memory.
+            disk: Disk size.
+            cpu: Cpu core count.
+            ip_count: External IP addresses count.
+            password: Desired password.
+            send_password: Send password to email or not.
+            open_support_access: Open access for Flops support team or not.
+            public_key_id: ID of public keys to add to new VM.
+            software_id: ID of software should be installed on new VM.
+
+        Returns:
+            0 is VM successfully created, 1 if VM not created and
+            -1 if there is no errors, but no info about VM is received.
+
+        """
         # Generate Flops API URL for creating virtual server.
         url = '{0}vm/install/'.format(FlopsApi.api_link)
         logger.debug('URL for create-vm: {0}'.format(url))
@@ -243,6 +342,17 @@ class FlopsApi(object):
             return 1
 
     def delete_vm(self, vm_id, tenant_id):
+        """
+        Function deletes VM by VM ID and Tenant ID.
+
+        Args:
+            vm_id: Virtual machine ID.
+            tenant_id: Tenant ID.
+
+        Returns:
+            0.
+
+        """
         url = '{0}vm/{1}/delete'.format(FlopsApi.api_link, vm_id)
         # Getting info in raw(json) format.
 
@@ -264,6 +374,16 @@ class FlopsApi(object):
         return 0
 
     def shutdown(self, vm_id, tenant_id):
+        """
+        Function shutdown VM by VM ID and Tenant ID.
+
+        Args:
+            vm_id: VM ID.
+            tenant_id: Tenant ID.
+
+        Returns:
+            0 if VM is stopped, 1 otherwise.
+        """
         url = '{0}vm/{1}/poweroff'.format(FlopsApi.api_link, vm_id)
 
         key_exist = self.check_inflo_key(vm_id)

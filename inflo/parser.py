@@ -10,10 +10,10 @@ api_link = FlopsApi.api_link
 
 def invoke_get_tenant_info(args):
     """
-    This function prints info about available tenants.
+    This function invokes info method of flops class.
 
     Args:
-        args: Arguments, received from arpgparse object.
+        args: Namespace, received from arpgparse object.
     """
     url = '{0}tenant/'.format(api_link)
     flops = FlopsApi(args.api_key, args.customer_id)
@@ -22,10 +22,10 @@ def invoke_get_tenant_info(args):
 
 def invoke_server_list(args):
     """
-    This function prints list of available servers.
+    This function invokes info method of flops class.
 
     Args:
-        args: Arguments, received from arpgparse object.
+        args: Namespace, received from arpgparse object.
     """
     url = '{0}vm/'.format(api_link)
     flops = FlopsApi(args.api_key, args.customer_id)
@@ -34,10 +34,10 @@ def invoke_server_list(args):
 
 def invoke_get_vm_info(args):
     """
-    This function prints info about virtual server.
+    This function invokes info method of flops class.
 
     Args:
-        args: Arguments, received from arpgparse object.
+        args: Namespace, received from arpgparse object.
     """
     url = '{0}vm/{1}/'.format(api_link, args.vm_id)
     flops = FlopsApi(args.api_key, args.customer_id)
@@ -46,10 +46,10 @@ def invoke_get_vm_info(args):
 
 def invoke_os_list(args):
     """
-    This function prints list of distributions, available to install.
+    This function invokes info method of flops class.
 
     Args:
-        args: Arguments, received from arpgparse object.
+        args: Namespace, received from arpgparse object.
     """
     url = '{0}distribution/'.format(api_link)
     flops = FlopsApi(args.api_key, args.customer_id)
@@ -57,36 +57,72 @@ def invoke_os_list(args):
 
 
 def invoke_get_vm_snapshots(args):
+    """
+    This function invokes info method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     url = '{0}vm/{1}/snapshots/'.format(api_link, args.vm_id)
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.info(url)
 
 
 def invoke_get_vm_backups(args):
+    """
+    This function invokes info method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     url = '{0}vm/{1}/backups/'.format(api_link, args.vm_id)
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.info(url)
 
 
 def invoke_get_pubkeys(args):
+    """
+    This function invokes info method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     url = '{0}pubkeys/'.format(api_link)
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.info(url)
 
 
 def invoke_get_software(args):
+    """
+    This function invokes info method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     url = '{0}software/'.format(api_link)
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.info(url)
 
 
 def invoke_get_tariffs(args):
+    """
+    This function invokes info method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     url = '{0}tariffs/'.format(api_link)
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.info(url)
 
 
 def invoke_create_vm(args):
+    """
+    This function invokes create_vm method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     logger.debug('Args list for create virtual server:\n{0}'.format(args))
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.create_vm(args.name, args.tenant_id, args.distr_id, args.tariff_id, args.memory, args.disk, args.cpu,
@@ -95,11 +131,23 @@ def invoke_create_vm(args):
 
 
 def invoke_delete_vm(args):
+    """
+    This function invokes delete_vm method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.delete_vm(args.vm_id, args.tenant_id)
 
 
 def invoke_shutdown(args):
+    """
+    This function invokes info method of flops class.
+
+    Args:
+        args: Namespace, received from arpgparse object.
+    """
     flops = FlopsApi(args.api_key, args.customer_id)
     flops.shutdown(args.vm_id, args.tenant_id)
 
